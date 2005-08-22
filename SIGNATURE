@@ -1,0 +1,75 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6a0aebda959d6da33f5f0b8e950990e55c5c4ef4 Build.PL
+SHA1 8c73bef555141b7b85c9521814a08ed8ad165896 LICENSE
+SHA1 216f56114eb5c057e2ff06bdbdd91b266374dedd MANIFEST
+SHA1 b489c64f8dc5ceb11778f1a0e557c6c9a41800e1 META.yml
+SHA1 a359d4072690a21ce63e4b393bdbc19d72b6be5a Makefile.PL
+SHA1 98c398de492245688d14ffa0893402c4990e9490 README
+SHA1 f09f78febd090f47a8a017fc4fd4d6c0ac60bb6d bbtest
+SHA1 a11cd57c6384d6b9af2d92c5ee17ff79e31a8f3e lib/BBCode/Body.pm
+SHA1 d55d4947915b515ae30d3d9e7f4ccacc32d1783b lib/BBCode/Parser.pm
+SHA1 bcea2d2714ac03eb3be886aabb4f726b8287fb9d lib/BBCode/Tag.pm
+SHA1 64ebfc76e49245215138b6bca14a5a13b306f502 lib/BBCode/Tag/ABBR.pm
+SHA1 ee30a4a45a7e9e0c04615b8209c595d1f779406e lib/BBCode/Tag/ACRONYM.pm
+SHA1 0394e2888ecb21076fa67dc14384c1ab5da50d32 lib/BBCode/Tag/B.pm
+SHA1 327990d85e227796e9adad7cb8a1f24183861728 lib/BBCode/Tag/BR.pm
+SHA1 a0ca429b8e1942e628799363a0e91f44b6d164a2 lib/BBCode/Tag/Block.pm
+SHA1 7e0bff343aa1c14c3a3c73f9d79db76321215e4c lib/BBCode/Tag/CODE.pm
+SHA1 2b18f0f9bc97f16559bc8bed4ca133e0ecb4d6dd lib/BBCode/Tag/COLOR.pm
+SHA1 a6fda911f9965f96fa23268803837650a6864910 lib/BBCode/Tag/EMAIL.pm
+SHA1 8013a0f5d0d65521e1affa5bd30a0a2d64f232d3 lib/BBCode/Tag/ENT.pm
+SHA1 efdd4854d748ede507e1738f769347cf7b2a446e lib/BBCode/Tag/FONT.pm
+SHA1 a7d3ca2a93f8439a848226eb67df152fc202c9c6 lib/BBCode/Tag/HIDDEN.pm
+SHA1 a1cedf814fb120418ea167b30440cc6e04b17dd1 lib/BBCode/Tag/HR.pm
+SHA1 93cfe3d24a865536433b69414f1e065b5b8a8b99 lib/BBCode/Tag/HTML.pm
+SHA1 00c2761c9a3ef973689d325b3c449a819823c496 lib/BBCode/Tag/I.pm
+SHA1 a356485e911ebe2052ecd2c7c538cbf216695c24 lib/BBCode/Tag/IMG.pm
+SHA1 9c30e16fed5ee71e8e5dc0996d7531b3cd9a82ff lib/BBCode/Tag/Inline.pm
+SHA1 7bd28880853eec3773074a095046db607f29b2d0 lib/BBCode/Tag/LI.pm
+SHA1 e21cf1269a77e42770a6e591b2915728973fd427 lib/BBCode/Tag/LIST.pm
+SHA1 84fd7a13de562bc7cbecbb035fda919eef7486a2 lib/BBCode/Tag/OL.pm
+SHA1 8bfb669b4eb693559eabaf0ed6eb427998725e30 lib/BBCode/Tag/Q.pm
+SHA1 968793f9ed3d527a71e9d459ad4d01847553cc7d lib/BBCode/Tag/QUOTE.pm
+SHA1 fcf0e9c584dcee8f7c16873aba273139d4ac65ad lib/BBCode/Tag/S.pm
+SHA1 472fa64503f7944287cb513a1871a0b46ba38cf2 lib/BBCode/Tag/SIZE.pm
+SHA1 30d081b79d59cb47049aeee1a631394309a8b151 lib/BBCode/Tag/SUB.pm
+SHA1 a0b2d574c3c2752c8c8da3658dd642105155860a lib/BBCode/Tag/SUP.pm
+SHA1 6635994a1c5fbf49c8ad1ed8dc4067f99b5b918d lib/BBCode/Tag/Simple.pm
+SHA1 a3cbd23f6d0141789a86c7ca80a15c19b7d07619 lib/BBCode/Tag/TEXT.pm
+SHA1 c7fe2a403db4519037e6132943b9b1fa0edfcbfc lib/BBCode/Tag/TT.pm
+SHA1 3781789db2b015d8ce1010efa66b56989b196937 lib/BBCode/Tag/U.pm
+SHA1 68da24e08c515210ad067206de713caf1dac980d lib/BBCode/Tag/UL.pm
+SHA1 093627075b2f173ca5d9984b6ed0a3f9d719e9ca lib/BBCode/Tag/URL.pm
+SHA1 ce0796ca054b6eecfa2bfc799100a0763c59f691 lib/BBCode/Tag/xEMAIL.pm
+SHA1 c866e88e89550448bbc3bcb13237d274d0f5cc4b lib/BBCode/Tag/xIMG.pm
+SHA1 fdbbcd55a8ecbf3a6fde9d646fa51bb626ccc42b lib/BBCode/Tag/xURL.pm
+SHA1 848e92b4e15afbe8876cd076d4fe3c08350d0bc5 lib/BBCode/Util.pm
+SHA1 ca86ad6a2941a8a3504bf6c42854aa3b76899a79 t/00-basic.t
+SHA1 c3f5f93aab37282c8933164d49ad37c8725ca760 t/10-inline.t
+SHA1 c2cb4929bd91af51b12ac062d36179f57364c4b1 t/20-block.t
+SHA1 339d8f77e55221c5c98fb7273d0d2b902b6521bb t/30-raw.t
+SHA1 9e590c93df0de743361d1cb93d0500306d4e26e0 t/35-link.t
+SHA1 f7188dcec88bbf6fa8da57894fdb83543d1b2365 t/40-stress.t
+SHA1 5d0f02c9d0e33d9591367bfe240e03eb5ffdf345 t/common.ph
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDChgjtI+z6Ps/jz8RApMpAJ0S2quozU9osuMsjNkJNlPNLuovGACdEqAd
+O4c9JXl416HUUG1k6q9fFWc=
+=Yxx/
+-----END PGP SIGNATURE-----

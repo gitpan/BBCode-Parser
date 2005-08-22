@@ -1,0 +1,66 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib 'lib';
+use BBCode::Util qw(parseBool);
+use BBCode::Parser;
+use Getopt::Long;
+
+my $p = BBCode::Parser->new();
+my $outputBBC = 0;
+my $outputHTML = 1;
+
+sub doText($) {
+	my $tree = $p->parse($_[0]);
+	print $tree->toBBCode(), "\n" if $outputBBC;
+	print $tree->toHTML(), "\n" if $outputHTML;
+}
+
+sub doFile($) {
+	my($fn,$text);
+	$fn = shift;
+	$text = "";
+
+	open(FILE, '<', $fn) or die qq(Failed to open "$fn": $!);
+	binmode(FILE);
+	while(<FILE>) {
+		tr/\x0D\x0A/\r\n/;
+		s/[\r\n]*$//;
+		$text .= "$_\n";
+	}
+	close(FILE);
+
+	doText($text);
+}
+
+Getopt::Long::Configure(qw(gnu_getopt bundling_override));
+GetOptions(
+	'option|O:s%' => sub {
+		$p->set($_[1] => $_[2]);
+	},
+
+	'permit|P=s' => sub {
+		$p->permit($_[1]);
+	},
+
+	'forbid|F=s' => sub {
+		$p->forbid($_[1]);
+	},
+
+	'bbcode|B' => sub {
+		$outputBBC = 1;
+		$outputHTML = 0;
+	},
+
+	'html|H' => sub {
+		$outputBBC = 0;
+		$outputHTML = 1;
+	},
+
+	'file|f=s' => sub {
+		doFile($_[1]);
+	},
+
+	'<>' => \&doText,
+);
+doText(shift) while @ARGV;

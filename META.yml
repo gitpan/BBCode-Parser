@@ -1,0 +1,87 @@
+---
+name: BBCode-Parser
+version: 0.01
+author:
+  - Donald King <dlking@cpan.org>
+abstract: Parses BBCode tags
+license: perl
+provides:
+  BBCode::Body:
+    file: lib/BBCode/Body.pm
+  BBCode::Parser:
+    file: lib/BBCode/Parser.pm
+    version: 0.01
+  BBCode::Tag:
+    file: lib/BBCode/Tag.pm
+  BBCode::Tag::ABBR:
+    file: lib/BBCode/Tag/ABBR.pm
+  BBCode::Tag::ACRONYM:
+    file: lib/BBCode/Tag/ACRONYM.pm
+  BBCode::Tag::B:
+    file: lib/BBCode/Tag/B.pm
+  BBCode::Tag::BR:
+    file: lib/BBCode/Tag/BR.pm
+  BBCode::Tag::Block:
+    file: lib/BBCode/Tag/Block.pm
+  BBCode::Tag::CODE:
+    file: lib/BBCode/Tag/CODE.pm
+  BBCode::Tag::COLOR:
+    file: lib/BBCode/Tag/COLOR.pm
+  BBCode::Tag::EMAIL:
+    file: lib/BBCode/Tag/EMAIL.pm
+  BBCode::Tag::ENT:
+    file: lib/BBCode/Tag/ENT.pm
+  BBCode::Tag::FONT:
+    file: lib/BBCode/Tag/FONT.pm
+  BBCode::Tag::HIDDEN:
+    file: lib/BBCode/Tag/HIDDEN.pm
+  BBCode::Tag::HR:
+    file: lib/BBCode/Tag/HR.pm
+  BBCode::Tag::HTML:
+    file: lib/BBCode/Tag/HTML.pm
+  BBCode::Tag::I:
+    file: lib/BBCode/Tag/I.pm
+  BBCode::Tag::IMG:
+    file: lib/BBCode/Tag/IMG.pm
+  BBCode::Tag::Inline:
+    file: lib/BBCode/Tag/Inline.pm
+  BBCode::Tag::LI:
+    file: lib/BBCode/Tag/LI.pm
+  BBCode::Tag::LIST:
+    file: lib/BBCode/Tag/LIST.pm
+  BBCode::Tag::OL:
+    file: lib/BBCode/Tag/OL.pm
+  BBCode::Tag::Q:
+    file: lib/BBCode/Tag/Q.pm
+  BBCode::Tag::QUOTE:
+    file: lib/BBCode/Tag/QUOTE.pm
+  BBCode::Tag::S:
+    file: lib/BBCode/Tag/S.pm
+  BBCode::Tag::SIZE:
+    file: lib/BBCode/Tag/SIZE.pm
+  BBCode::Tag::SUB:
+    file: lib/BBCode/Tag/SUB.pm
+  BBCode::Tag::SUP:
+    file: lib/BBCode/Tag/SUP.pm
+  BBCode::Tag::Simple:
+    file: lib/BBCode/Tag/Simple.pm
+  BBCode::Tag::TEXT:
+    file: lib/BBCode/Tag/TEXT.pm
+  BBCode::Tag::TT:
+    file: lib/BBCode/Tag/TT.pm
+  BBCode::Tag::U:
+    file: lib/BBCode/Tag/U.pm
+  BBCode::Tag::UL:
+    file: lib/BBCode/Tag/UL.pm
+  BBCode::Tag::URL:
+    file: lib/BBCode/Tag/URL.pm
+  BBCode::Tag::xEMAIL:
+    file: lib/BBCode/Tag/xEMAIL.pm
+  BBCode::Tag::xIMG:
+    file: lib/BBCode/Tag/xIMG.pm
+  BBCode::Tag::xURL:
+    file: lib/BBCode/Tag/xURL.pm
+  BBCode::Util:
+    file: lib/BBCode/Util.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

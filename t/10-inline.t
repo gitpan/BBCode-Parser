@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+# $Id: 10-inline.t 75 2005-08-22 18:22:43Z chronos $
+
+use Test::More tests => 51;
+use strict;
+use warnings;
+use lib 't';
+
+BEGIN { require "common.ph"; }
+
+BEGIN { use_ok 'BBCode::Parser'; }
+
+our $p = BBCode::Parser->new;
+
+bbtest	q(Simple example),
+		q(Simple example);
+
+bbtest	q([TEXT="Internal "]example),
+		q(Internal example),
+		q(Internal example);
+
+bbtest	q(Multi[BR]Line),
+		qq(Multi<br/>Line);
+
+bbtest	qq(Multi\nLine),
+		qq(Multi<br/>\nLine);
+
+bbtest	q([ENT=amp]),
+		q(&amp;);
+
+bbtest	q([B]Bold[/B] text),
+		q(<b>Bold</b> text);
+
+bbtest	q([I]Italic[/I] text),
+		q(<i>Italic</i> text);
+
+bbtest	q([U]Underlined[/U] text),
+		q(<span class="bbcode-u">Underlined</span> text);
+
+bbtest	q([S]Strike-through[/S] text),
+		q(<span class="bbcode-s">Strike-through</span> text);
+
+bbtest	q([Q]Quoted[/Q] text),
+		q(<q>Quoted</q> text);
+
+bbtest	q([TT]Teletype[/TT] text),
+		q(<tt>Teletype</tt> text);
+
+bbtest	q(S[SUP]uper[/SUP]script text),
+		q(S<sup>uper</sup>script text);
+
+bbtest	q(S[SUB]ub[/SUB]script text),
+		q(S<sub>ub</sub>script text);
+
+bbtest	q([FONT=Verdana]Named-font[/FONT] text),
+		q(<span style="font-family: 'Verdana'">Named-font</span> text);
+
+bbtest	q([FONT="Times New Roman"]Named-font[/FONT] text),
+		q(<span style="font-family: 'Times New Roman'">Named-font</span> text);
+
+bbtest	q([SIZE=10pt]Named-size[/SIZE] text),
+		q(<span style="font-size: 10pt">Named-size</span> text);
+
+bbtest	q([SIZE=6pt]Tiny[/SIZE] text),
+		q([SIZE=8pt]Tiny[/SIZE] text),
+		q(<span style="font-size: 8pt">Tiny</span> text);
+
+bbtest	q([COLOR=blue]Named-color[/COLOR] text),
+		q(<span style="color: blue">Named-color</span> text);
+
+bbtest	q([COLOR=#cf]Hex color[/COLOR] text),
+		q([COLOR=#cfcfcf]Hex color[/COLOR] text),
+		q(<span style="color: #cfcfcf">Hex color</span> text);
+
+bbtest	q([COLOR="rgba(0%,0%,100%,75%)"]RGBA color[/COLOR] text),
+		q(<span style="color: rgba(0%,0%,100%,75%)">RGBA color</span> text);
+
+bbtest	q([URL=http://slashdot.org/]Linked[/URL] text),
+		q(<a href="http://slashdot.org/" rel="nofollow">Linked</a> text);
+
+bbtest	q(More [EMAIL=chronos@chronos-tachyon.net]linked[/EMAIL] text),
+		q(More <a href="mailto:chronos@chronos-tachyon.net">linked</a> text);
+
+bbtest	q(Image: [IMG=http://chronos.dyndns.org/images/me/20040419-closeup.jpg, ALT="[My Face]", W=818, H=958]),
+		q(Image: <img src="http://chronos.dyndns.org/images/me/20040419-closeup.jpg" alt="[My Face]" width="818" height="958" />);
+
+bbtest	q([URL=http://slashdot.org/, FOLLOW=1]Linked[/URL] text),
+		q(<a href="http://slashdot.org/" rel="nofollow">Linked</a> text);
+
+$p->set(follow_override => 1);
+
+bbtest	q([URL=http://slashdot.org/, FOLLOW=1]Linked[/URL] text),
+		q(<a href="http://slashdot.org/">Linked</a> text);
+
+# vim:set ft=perl:
