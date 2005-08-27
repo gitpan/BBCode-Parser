@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# $Id: 10-inline.t 75 2005-08-22 18:22:43Z chronos $
+# $Id: 10-inline.t 91 2005-08-27 11:00:11Z chronos $
 
-use Test::More tests => 51;
+use Test::More tests => 55;
 use strict;
 use warnings;
 use lib 't';
@@ -58,22 +58,29 @@ bbtest	q([FONT=Verdana]Named-font[/FONT] text),
 bbtest	q([FONT="Times New Roman"]Named-font[/FONT] text),
 		q(<span style="font-family: 'Times New Roman'">Named-font</span> text);
 
-bbtest	q([SIZE=10pt]Named-size[/SIZE] text),
+bbtest	q([FONT, SIZE=10pt]Named-size[/FONT] text),
 		q(<span style="font-size: 10pt">Named-size</span> text);
 
 bbtest	q([SIZE=6pt]Tiny[/SIZE] text),
-		q([SIZE=8pt]Tiny[/SIZE] text),
+		q([FONT, SIZE=8pt]Tiny[/FONT] text),
 		q(<span style="font-size: 8pt">Tiny</span> text);
 
-bbtest	q([COLOR=blue]Named-color[/COLOR] text),
+bbtest	q([FONT, COLOR=blue]Named-color[/FONT] text),
 		q(<span style="color: blue">Named-color</span> text);
 
-bbtest	q([COLOR=#cf]Hex color[/COLOR] text),
-		q([COLOR=#cfcfcf]Hex color[/COLOR] text),
+bbtest	q([FONT, COLOR=#cf]Hex color[/FONT] text),
+		q([FONT, COLOR=#cfcfcf]Hex color[/FONT] text),
 		q(<span style="color: #cfcfcf">Hex color</span> text);
 
-bbtest	q([COLOR="rgba(0%,0%,100%,75%)"]RGBA color[/COLOR] text),
+bbtest	q([FONT, COLOR="rgba(0%,0%,100%,75%)"]RGBA color[/FONT] text),
 		q(<span style="color: rgba(0%,0%,100%,75%)">RGBA color</span> text);
+
+bbtest	q([COLOR=red]COLOR auto-replace[/COLOR]),
+		q([FONT, COLOR=red]COLOR auto-replace[/FONT]),
+		q(<span style="color: red">COLOR auto-replace</span>);
+
+bbtest	q([FONT=Verdana, SIZE=10pt, COLOR=blue]Multi-attribute FONT[/FONT]),
+		q(<span style="font-family: 'Verdana'; font-size: 10pt; color: blue">Multi-attribute FONT</span>);
 
 bbtest	q([URL=http://slashdot.org/]Linked[/URL] text),
 		q(<a href="http://slashdot.org/" rel="nofollow">Linked</a> text);

@@ -1,9 +1,10 @@
-# $Id: SIZE.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: SIZE.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Tag::SIZE;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(:parse);
 use strict;
 use warnings;
+our $VERSION = '0.02';
 
 sub BodyPermitted($):method {
 	return 1;
@@ -31,15 +32,23 @@ sub validateParam($$$):method {
 	return $this->SUPER::validateParam($param,$val);
 }
 
-# TODO: Add SIZE->replace() to swap [SIZE=nnn] for [FONT SIZE=nnn]
-sub toHTML($):method {
+sub replace($):method {
 	my $this = shift;
-	my $ret = sprintf q(<span style="font-size: %s">), $this->param('VAL');
-	foreach($this->body) {
-		$ret .= $_->toHTML;
-	}
-	$ret .= '</span>';
-	return $ret;
+	my $that = BBCode::Tag->new($this->parser, 'FONT', [ 'SIZE', $this->param('VAL') ]);
+	$that->pushBody($this->body);
+	return $that;
+}
+
+sub toBBCode($):method {
+	return shift->replace->toBBCode;
+}
+
+sub toHTML($):method {
+	return shift->replace->toHTML;
+}
+
+sub toLinkList($):method {
+	return shift->replace->toLinkList;
 }
 
 1;

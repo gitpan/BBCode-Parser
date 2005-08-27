@@ -1,10 +1,11 @@
-# $Id: LIST.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: LIST.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Tag::LIST;
 use base qw(BBCode::Tag::Block);
 use BBCode::Util qw(:parse encodeHTML);
 use BBCode::Tag::TEXT ();
 use strict;
 use warnings;
+our $VERSION = '0.01';
 
 sub Class($):method {
 	return qw(LIST BLOCK);

@@ -10,26 +10,134 @@ DESCRIPTION
 
     "BBCode::Parser" is a proper recursive parser for BBCode-formatted text.
 
+OVERVIEW
+    A "BBCode::Parser" object represents various settings that affect the
+    parsing process. Simple settings are typically set when the parser is
+    created using "new", but they can be queried using "get" and altered
+    using "set".
+
+    See "SETTINGS" for more information.
+
+    In addition to the simple settings, specific BBCode tags (or classes of
+    tags) can be permitted or forbidden, using "permit" and "forbid"
+    respectively. By default, the only forbidden tag is "[HTML]", which is
+    normally a security violation if permitted.
+
+    See "CLASSES" for a list of tag classes.
+
+    Once the parser has been configured appropriately, parse trees can be
+    created using the "parse" method. The parse tree will consist of objects
+    derived from BBCode::Tag; the root of the tree will be a BBCode::Body.
+
+    Converting the parse tree to HTML is quite simple: call toHTML() on the
+    root of the tree. Likewise, the parse tree can be converted back to
+    BBCode by calling toBBCode(). See "METHODS" in BBCode::Tag to find out
+    what other output methods are available.
+
+SETTINGS
+    The following settings can be manipulated using "get" and "set".
+
+    css_prefix
+        (Type: String; Default: "bbcode-")
+
+        Many BBCode tags will add CSS classes as style hooks in the output
+        HTML, such as "<div class="bbcode-quote">...</div>". This setting
+        allows you to override the naming scheme for those hooks. At the
+        moment, more direct control of the CSS class names is not available.
+
+    css_direct_styles
+        (Type: Boolean; Default: FALSE)
+
+        Certain style-related BBCode tags, such as [U] (underline) and [S]
+        (strike-through) don't have a direct equivalent in modern XHTML 1.0
+        Strict. If this value is TRUE, then the generated HTML will use a
+        "style" attribute on a "<span>" tag to simulate the effects. If this
+        value is FALSE, then the style attribute will be omitted. In either
+        case, a "class" attribute is provided for use as a hook by external
+        CSS stylesheets (not provided).
+
+    follow_links
+        (Type: Boolean; Default: FALSE)
+
+        To prevent blog spam and the like, many search engines now allow
+        HTML authors to indicate that specific URLs on a page should not be
+        indexed. If this value is TRUE, then there will be nothing special
+        about the URL (meaning that search engines are encouraged to follow
+        the link). If this value is FALSE, then a "rel="nofollow"" attribute
+        will be added wherever it makes sense (warning search engines that
+        the link might be spam).
+
+        Whether or not to set this value to TRUE will depend on what you're
+        using "BBCode::Parser" for. If you're implementing a forum or
+        bulletin board, TRUE might be reserved for senior, more trusted
+        members. If you're implementing a blog, the value might be TRUE for
+        the blog owner but FALSE for visitors.
+
+        For more information, see
+        <http://www.google.com/webmasters/bot.html#www>.
+
+    follow_override
+        (Type: Boolean; Default: FALSE)
+
+        This BBCode implementation allows a user to override the
+        follow_links setting using a BBCode extension, "FOLLOW=1". If this
+        value is TRUE, the user can override "follow_links"; otherwise, the
+        user must abide by "follow_links".
+
+        The same considerations that apply to "follow_links" also apply to
+        this setting.
+
+    allow_image_bullets
+        (Type: Boolean; Default: TRUE)
+
+        This setting allows you to restrict users from creating lists with
+        custom bullets.
+
+CLASSES
+    FIXME: Add documentation on tag classes.
+
 METHODS
+  DEFAULT
+            my $tree = DEFAULT->parse($code);
+
+    "DEFAULT" returns the default parser. If you change the default parser,
+    all future parsers created with "new" will incorporate your changes.
+    However, all existing parsers will be unaffected.
+
+  clone
+            my $parser = BBCode::Parser->new(follow_links => 1);
+            my $clone = $parser->clone;
+            $clone->forbid('IMG');
+            printf "[IMG] is%s OK\n", ($parser->isPermitted('IMG') ? "" : " not");
+            # Prints "[IMG] is OK", since forbid('IMG') applies only to the clone.
+
+    "clone" creates a new parser that copies the settings of an existing
+    parser. After cloning, the two parsers are completely independent;
+    changing settings in one does not affect the other.
+
+    If any arguments are given, they are handed off to the set() method.
+
   new
             my $parser = BBCode::Parser->new(%args);
 
     "new" creates a new "BBCode::Parser". Any arguments are handed off to
-    the "set" method.
+    the set() method.
 
   get
-            if($parser->get('foo')) {
-                    # Foo enabled
+            if($parser->get('follow_override')) {
+                    # [URL FOLLOW] permitted
             } else {
-                    # Foo disabled
+                    # [URL FOLLOW] forbidden
             }
 
-    "get" returns settings for the given parser.
+    "get" fetches the current settings for the given parser. See "SETTINGS"
+    for a list of available settings.
 
   set
-            $parser->set(foo => 1);
+            $parser->set(follow_override => 1);
 
-    "set" alters settings for the given parser.
+    "set" alters the settings for the given parser. See "SETTINGS" for a
+    list of available settings.
 
   permit
             $parser->permit(qw(:INLINE !:LINK));
@@ -47,10 +155,10 @@ METHODS
             if($parser->isPermitted('IMG')) {
                     # Yay, [IMG] tags
             } else {
-                    # Damn, no [IMG] tags
+                    # Darn, no [IMG] tags
             }
 
-    "forbid" checks if a tag is permitted by the current settings.
+    "isPermitted" checks if a tag is permitted by the current settings.
 
   parse
             my $tree = $parser->parse('[b]BBCode[/b] text.');
@@ -63,6 +171,8 @@ METHODS
 
 SEE ALSO
     BBCode::Tag
+
+    <svn://chronos-tachyon.net/projects/BBCode-Parser>
 
 AUTHOR
     Donald King <dlking@cpan.org>

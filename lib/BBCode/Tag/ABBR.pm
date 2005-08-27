@@ -1,17 +1,10 @@
-# $Id: ABBR.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: ABBR.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Tag::ABBR;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(encodeHTML);
 use strict;
 use warnings;
-
-sub MinArgs($):method {
-	return 0;
-}
-
-sub MaxArgs($):method {
-	return 1;
-}
+our $VERSION = '0.02';
 
 sub BodyPermitted($):method {
 	return 1;

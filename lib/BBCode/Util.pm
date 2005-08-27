@@ -1,18 +1,19 @@
-# $Id: Util.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: Util.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Util;
 use base qw(Exporter);
+use Carp qw(croak);
 use HTML::Entities ();
 use POSIX ();
 use URI ();
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.20';
 our @EXPORT;
 our @EXPORT_OK;
 our %EXPORT_TAGS;
 
-sub _tag {
+sub _export {
 	my $sym = shift;
 	$sym =~ s/^(?=\w)/&/;
 	unshift @_, 'ALL';
@@ -23,20 +24,49 @@ sub _tag {
 	}
 }
 
-BEGIN { _tag qw(tagLoadPackage tag) }
+BEGIN { _export qw(pkgFilename pkg) }
+sub pkgFilename($) {
+	if($_[0] =~ /^((?:\w+::)*\w+)$/) {
+		local $_ = $1;
+		s#::#/#g;
+		s/$/.pm/;
+		return $_;
+	}
+	return undef;
+}
+
+my %userTags = (
+	'BODY' => 'BBCode::Body',
+);
+
+BEGIN { _export qw(tagUserDefined tag) }
+sub tagUserDefined($) {
+	my $pkg = shift;
+	my $file = pkgFilename($pkg);
+	croak qq(Invalid package name "$pkg") unless defined $file;
+	require $file;
+	my $obj = bless {}, $pkg;
+	croak qq(Package "$pkg" does not inherit from BBCode::Tag) unless UNIVERSAL::isa($obj,'BBCode::Tag');
+	$userTags{uc($obj->Tag)} = $pkg;
+}
+
+BEGIN { _export qw(tagLoadPackage tag) }
 sub tagLoadPackage($) {
-	my $tag = uc(shift);
-	$tag =~ s#^/##;
-	$tag =~ s/^_/x/;
-	my $pkg = "BBCode::Tag::$tag";
-	my $file = $pkg;
-	$file =~ s#::#/#g;
-	$file =~ s/$/.pm/;
+	my($tag,$pkg);
+	croak qq(Invalid tag name "$_[0]") unless $_[0] =~ m#^/?(_?\w+)$#;
+	$tag = uc($1);
+	if(exists $userTags{$tag}) {
+		$pkg = $userTags{$tag};
+	} else {
+		$tag =~ s/^_/x/;
+		$pkg = "BBCode::Tag::$tag";
+	}
+	my $file = pkgFilename($pkg);
 	require $file;
 	return $pkg;
 }
 
-BEGIN { _tag qw(tagExists tag) }
+BEGIN { _export qw(tagExists tag) }
 sub tagExists($) {
 	my $tag = shift;
 	return 1 if eval {
@@ -46,35 +76,68 @@ sub tagExists($) {
 	return 0;
 }
 
-BEGIN { _tag qw(quoteQ quote) }
+BEGIN { _export qw(tagCanonical tag) }
+sub tagCanonical($) {
+	local $_ = shift;
+	if(ref $_) {
+		return $_->Tag if UNIVERSAL::isa($_,'BBCode::Tag');
+		croak qq(Invalid reference);
+	} else {
+		return uc($1) if /^(:\w+)$/;
+		my $pkg = tagLoadPackage($_);
+		return $pkg->Tag;
+	}
+}
+
+BEGIN { _export qw(tagObject tag) }
+sub tagObject($) {
+	my $tag = shift;
+	if(ref $tag) {
+		return $tag if UNIVERSAL::isa($tag,'BBCode::Tag');
+		croak qq(Invalid reference);
+	} else {
+		my $pkg = tagLoadPackage($tag);
+		return bless {}, $pkg;
+	}
+}
+
+BEGIN { _export qw(tagHierarchy tag) }
+sub tagHierarchy($) {
+	my $tag = tagCanonical(shift);
+	return $tag if $tag =~ /^:/;
+	my $pkg = tagLoadPackage($tag);
+	return ($pkg->Tag, map { ":$_" } ($pkg->Class, 'ALL'));
+}
+
+BEGIN { _export qw(quoteQ quote) }
 sub quoteQ($) {
 	local $_ = $_[0];
 	s/([\\'])/\\$1/g;
 	return qq('$_');
 }
 
-BEGIN { _tag qw(quoteQQ quote) }
+BEGIN { _export qw(quoteQQ quote) }
 sub quoteQQ($) {
 	local $_ = $_[0];
 	s/([\\"])/\\$1/g;
 	return qq("$_");
 }
 
-BEGIN { _tag qw(quoteBS quote) }
+BEGIN { _export qw(quoteBS quote) }
 sub quoteBS($) {
 	local $_ = $_[0];
 	s/([\\\[\]"'=,\s\n])/\\$1/g;
 	return $_;
 }
 
-BEGIN { _tag qw(quoteRaw quote) }
+BEGIN { _export qw(quoteRaw quote) }
 sub quoteRaw($) {
 	local $_ = $_[0];
 	return undef if /[\\\[\]"'=,\s\n]/;
 	return $_;
 }
 
-BEGIN { _tag qw(quote quote) }
+BEGIN { _export qw(quote quote) }
 sub quote($) {
 	my @q = sort {
 		(length($a) <=> length($b)) or ($a cmp $b)
@@ -84,7 +147,7 @@ sub quote($) {
 	return $q[0];
 }
 
-BEGIN { _tag qw(encodeHTML encode); }
+BEGIN { _export qw(encodeHTML encode); }
 sub encodeHTML($) {
 	local $_ = $_[0];
 	if(defined $_) {
@@ -95,74 +158,12 @@ sub encodeHTML($) {
 	return $_;
 }
 
-BEGIN { _tag qw(decodeHTML encode); }
+BEGIN { _export qw(decodeHTML encode); }
 sub decodeHTML($) {
 	return HTML::Entities::decode($_[0]);
 }
 
-BEGIN { _tag qw(setUpdate set) }
-sub setUpdate(\%@) {
-	my $set = shift;
-	$set = { %$set } if defined wantarray;
-	while(@_) {
-		my $tag = shift;
-		next unless defined $tag;
-		if($tag =~ /\s/) {
-			$tag =~ s/^\s+|\s+$//g;
-			unshift @_, split /\s+/, $tag;
-		} elsif(UNIVERSAL::can($tag, 'Tag')) {
-			unshift @_, $tag->Tag;
-		} elsif($tag =~ s/^!//) {
-			$set->{$tag} = 0;
-		} else {
-			$set->{$tag} = 1;
-		}
-	}
-	return %$set if wantarray;
-	return $set;
-}
-
-BEGIN { _tag qw(setCreate set) }
-sub setCreate(@) {
-	my %set;
-	setUpdate(%set, @_);
-	return %set if wantarray;
-	return \%set;
-}
-
-BEGIN { _tag qw(setNegate set) }
-sub setNegate(\%) {
-	my $set = shift;
-	$set = { %$set } if defined wantarray;
-	foreach my $k (keys %$set) {
-		$set->{$k} = $set->{$k} ? 0 : 1;
-	}
-	return %$set if wantarray;
-	return $set;
-}
-
-BEGIN { _tag qw(setMerge set) }
-sub setMerge(\%\%) {
-	my $set = shift;
-	my $other = shift;
-	$set = { %$set } if defined wantarray;
-	foreach my $k (keys %$other) {
-		$set->{$k} = $other->{$k};
-	}
-	return %$set if wantarray;
-	return $set;
-}
-
-BEGIN { _tag qw(setContainsTag set) }
-sub setContainsTag(\%$;$) {
-	my($set,$tag,$default) = @_;
-	foreach($tag->Tag, map { ":$_" } ($tag->Class, 'ALL')) {
-		return $set->{$_} if exists $set->{$_};
-	}
-	return $default;
-}
-
-BEGIN { _tag qw(parseBool parse) }
+BEGIN { _export qw(parseBool parse) }
 sub parseBool($) {
 	local $_ = $_[0];
 	return undef if not defined $_;
@@ -182,7 +183,7 @@ sub parseBool($) {
 	return $_ ? 1 : 0;
 }
 
-BEGIN { _tag qw(parseNum parse) }
+BEGIN { _export qw(parseNum parse) }
 sub parseNum($);
 sub parseNum($) {
 	local $_ = $_[0];
@@ -200,7 +201,7 @@ sub parseNum($) {
 	return 0;
 }
 
-BEGIN { _tag qw(parseEntity parse) }
+BEGIN { _export qw(parseEntity parse) }
 sub parseEntity($);
 sub parseEntity($) {
 	local $_ = $_[0];
@@ -230,7 +231,7 @@ sub parseEntity($) {
 	return $_;
 }
 
-BEGIN { _tag qw(parseListType parse) }
+BEGIN { _export qw(parseListType parse) }
 my %listtype = (
 	'*'		=> [ qw(ul) ],
 	'1'		=> [ qw(ol decimal) ],
@@ -288,7 +289,7 @@ my %conv = (
 # Tweaked slightly to be more logical
 my @compat = qw(xx-small x-small small medium large x-large xx-large 300%);
 
-BEGIN { _tag qw(parseFontSize parse) }
+BEGIN { _export qw(parseFontSize parse) }
 sub parseFontSize($);
 sub parseFontSize($) {
 	local $_ = $_[0];
@@ -346,7 +347,7 @@ my %cssColor = map { $_ => 1 } qw(
 	black silver gray
 );
 
-BEGIN { _tag qw(parseColor parse) }
+BEGIN { _export qw(parseColor parse) }
 sub parseColor($) {
 	local $_ = $_[0];
 	return undef unless defined $_;
@@ -521,7 +522,7 @@ sub _url_parse($$) {
 	return $url;
 }
 
-BEGIN { _tag qw(parseURL parse) }
+BEGIN { _export qw(parseURL parse) }
 my %schemes = map { $_ => 1 } qw(http https ftp data);
 sub parseURL($) {
 	foreach('%', 'http://%') {
@@ -533,7 +534,7 @@ sub parseURL($) {
 	return undef;
 }
 
-BEGIN { _tag qw(parseMailURL parse) }
+BEGIN { _export qw(parseMailURL parse) }
 sub parseMailURL($) {
 	foreach('%', 'mailto:%') {
 		my $str = $_;
@@ -544,7 +545,7 @@ sub parseMailURL($) {
 	return undef;
 }
 
-BEGIN { _tag qw(textURL text) }
+BEGIN { _export qw(textURL text) }
 sub textURL($) {
 	my $url = shift;
 	$url = parseURL($url) if not ref $url;
@@ -575,7 +576,7 @@ sub textURL($) {
 
 }
 
-BEGIN { _tag qw(textALT text) }
+BEGIN { _export qw(textALT text) }
 sub textALT($) {
 	my $url = shift;
 	$url = parseURL($url) if not ref $url;

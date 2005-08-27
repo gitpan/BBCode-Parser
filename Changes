@@ -1,0 +1,13 @@
+Revision history for BBCode::Parser.
+
+A more detailed revision history is available via Subversion checkout.
+Browse <URL:svn://chronos-tachyon.net/projects/BBCode-Parser> for a complete
+history of the project.
+
+0.02
+* Documentation fixes
+
+0.01 [2005-08-22 13:22:43 -0500]
+* Initial release
+
+$Id: Changes 91 2005-08-27 11:00:11Z chronos $

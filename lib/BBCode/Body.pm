@@ -1,16 +1,17 @@
-# $Id: Body.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: Body.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Body;
 use base qw(BBCode::Tag);
 use BBCode::Tag::Block;
 use strict;
 use warnings;
+our $VERSION = '0.20';
 
 sub new($@):method {
 	return shift->_create(@_);
 }
 
 sub Tag($):method {
-	return '';
+	return 'BODY';
 }
 
 sub BodyPermitted($):method {

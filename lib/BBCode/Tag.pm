@@ -1,10 +1,12 @@
-# $Id: Tag.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: Tag.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Tag;
-use BBCode::Util qw(:quote :set :tag);
+use BBCode::Util qw(:quote :tag);
+use BBCode::TagSet;
+use Carp qw(croak);
 use HTML::Entities ();
-use Carp ();
 use strict;
 use warnings;
+our $VERSION = '0.20';
 
 =head1 NAME
 
@@ -110,10 +112,6 @@ sub ClosePost($):method {
 
 # Instance methods meant for overriding
 
-sub validateArg($$$):method {
-	return $_[2];
-}
-
 sub validateParam($$$):method {
 	return $_[2];
 }
@@ -129,12 +127,14 @@ sub _create($$@):method {
 	}, $class;
 
 	if($this->BodyPermitted) {
-		my @tags = $this->BodyTags;
-		my %ok;
-		$ok{':ALL'} = @tags ? 0 : 1;
-		setUpdate(%ok, @tags);
 		$this->{body} = [];
-		$this->{ok} = \%ok;
+		$this->{permit} = BBCode::TagSet->new;
+		$this->{forbid} = BBCode::TagSet->new;
+		if($this->BodyTags) {
+			$this->{permit}->add($this->BodyTags);
+		} else {
+			$this->{permit}->add(':ALL');
+		}
 	}
 
 	foreach($this->NamedParams) {
@@ -145,7 +145,7 @@ sub _create($$@):method {
 		my($k,$v) = (undef,shift);
 		($k,$v) = @$v if ref $v and UNIVERSAL::isa($v,'ARRAY');
 		$k = $this->DefaultParam if not defined $k;
-		die "No default parameter for [".$this->Tag."]" if not defined $k;
+		croak "No default parameter for [".$this->Tag."]" if not defined $k;
 		$this->param($k, $v);
 	}
 
@@ -166,9 +166,10 @@ sub new($$$@):method {
 	my $parser = shift;
 	my $tag = shift;
 	my $pkg = tagLoadPackage($tag);
+	$tag = $pkg->Tag;
 
-	Carp::confess "[".$pkg->Tag."] is not permitted by current settings"
-		if not $parser->isPermitted($pkg);
+	croak "Tag [$tag] is not permitted by current settings"
+		if not $parser->isPermitted($tag);
 
 	return $pkg->_create($parser, @_);
 }
@@ -197,8 +198,13 @@ sub parser($):method {
 
 sub isPermitted($$):method {
 	my($this,$child) = @_;
-	return 0 if not exists $this->{ok};
-	return setContainsTag(%{$this->{ok}}, $child, 0);
+	if(exists $this->{body}) {
+		foreach(tagHierarchy($child)) {
+			return 0 if $this->{forbid}->contains($_);
+			return 1 if $this->{permit}->contains($_);
+		}
+	}
+	return 0;
 }
 
 =head2 forbidTags
@@ -215,14 +221,18 @@ warning is raised.  In the future, this behavior will likely change.
 
 sub forbidTags($@):method {
 	my $this = shift;
-	if(exists $this->{ok}) {
-		# FIXME: Use set*() functions
-		foreach(@_) {
-			$this->{ok}->{$_} = 0;
+	if(exists $this->{body}) {
+		my $set;
+		if(@_ == 1 and UNIVERSAL::isa($_[0],'BBCode::TagSet')) {
+			$set = shift;
+		} else {
+			$set = BBCode::TagSet->new(@_);
 		}
-		foreach($this->body) {
-			warn qq(Nested child is now forbidden) unless $this->isPermitted($_);
-			$_->forbidTags(@_);
+		$this->{permit}->remove($set);
+		$this->{forbid}->add($set);
+		foreach my $child ($this->body) {
+			warn qq(Nested child is now forbidden) unless $this->isPermitted($child);
+			$child->forbidTags($set);
 		}
 	}
 	return $this;
@@ -289,16 +299,16 @@ If any arguments are strings, they are upgraded to virtual [TEXT] tags.
 
 sub pushBody($@):method {
 	my $this = shift;
-	Carp::confess qq(Body contents not permitted) unless $this->BodyPermitted;
+	croak qq(Body contents not permitted) unless $this->BodyPermitted;
 	while(@_) {
 		my $tag = shift;
 		if(ref $tag) {
-			Carp::confess qq(Expected a BBCode::Tag) unless UNIVERSAL::isa($tag, 'BBCode::Tag');
+			croak qq(Expected a BBCode::Tag) unless UNIVERSAL::isa($tag, 'BBCode::Tag');
 		} else {
 			$tag = BBCode::Tag->new($this->{parser}, 'TEXT', [ undef, $tag ]);
 		}
-		Carp::confess qq(Invalid tag nesting) if not $this->isPermitted($tag);
-		$tag->forbidTags(grep { not $this->{ok}->{$_} } keys %{$this->{ok}});
+		croak qq(Invalid tag nesting) if not $this->isPermitted($tag);
+		$tag->forbidTags($this->{forbid});
 		push @{$this->{body}}, $tag;
 	}
 	return $this;
@@ -308,9 +318,9 @@ sub param($$;$):method {
 	my($this,$param) = splice @_, 0, 2;
 
 	$param = $this->DefaultParam if not defined $param;
-	Carp::confess qq(Missing parameter name) unless defined $param;
+	croak qq(Missing parameter name) unless defined $param;
 	$param = uc $param;
-	Carp::confess qq(Invalid parameter name "$param") unless exists $this->{params}->{$param};
+	croak qq(Invalid parameter name "$param") unless exists $this->{params}->{$param};
 
 	if(@_) {
 		$this->{params}->{$param} = $this->validateParam($param,@_);
@@ -391,8 +401,7 @@ sub toBBCode($):method {
 }
 
 sub toHTML($):method {
-	require Carp;
-	Carp::confess qq(Not implemented);
+	croak qq(Not implemented);
 }
 
 sub toLinkList($;$):method {

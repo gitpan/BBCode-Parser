@@ -1,9 +1,10 @@
-# $Id: xIMG.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: xIMG.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Tag::xIMG;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(:parse :encode :text);
 use strict;
 use warnings;
+our $VERSION = '0.01';
 
 sub Tag($):method {
 	return 'IMG';

@@ -1,8 +1,9 @@
-# $Id: I.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: I.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Tag::I;
 use base qw(BBCode::Tag::Simple BBCode::Tag::Inline);
 use strict;
 use warnings;
+our $VERSION = '0.01';
 
 sub BodyPermitted($):method {
 	return 1;

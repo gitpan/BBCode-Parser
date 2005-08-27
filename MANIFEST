@@ -1,11 +1,13 @@
 MANIFEST			This list of files
-META.yml
-LICENSE
-README
-Build.PL
-Makefile.PL
+META.yml			Machine-readable package information
+LICENSE				Copyright terms
+README				Introduction
+Changes				Revision history
+Build.PL			Build script
+Makefile.PL			Backward compatible build script
 bbtest
 lib/BBCode/Util.pm
+lib/BBCode/TagSet.pm
 lib/BBCode/Parser.pm
 lib/BBCode/Tag.pm
 lib/BBCode/Body.pm

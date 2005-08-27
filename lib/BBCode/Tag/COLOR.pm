@@ -1,9 +1,10 @@
-# $Id: COLOR.pm 75 2005-08-22 18:22:43Z chronos $
+# $Id: COLOR.pm 91 2005-08-27 11:00:11Z chronos $
 package BBCode::Tag::COLOR;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(:parse encodeHTML);
 use strict;
 use warnings;
+our $VERSION = '0.02';
 
 sub BodyPermitted($):method {
 	return 1;
@@ -31,14 +32,23 @@ sub validateParam($$$):method {
 	return $this->SUPER::validateParam($param,$val);
 }
 
-sub toHTML($):method {
+sub replace($):method {
 	my $this = shift;
-	my $ret = sprintf q(<span style="color: %s">), encodeHTML($this->param('VAL'));
-	foreach($this->body) {
-		$ret .= $_->toHTML;
-	}
-	$ret .= '</span>';
-	return $ret;
+	my $that = BBCode::Tag->new($this->parser, 'FONT', [ 'COLOR', $this->param('VAL') ]);
+	$that->pushBody($this->body);
+	return $that;
+}
+
+sub toBBCode($):method {
+	return shift->replace->toBBCode;
+}
+
+sub toHTML($):method {
+	return shift->replace->toHTML;
+}
+
+sub toLinkList($):method {
+	return shift->replace->toLinkList;
 }
 
 1;
