@@ -1,4 +1,4 @@
-# $Id: Util.pm 91 2005-08-27 11:00:11Z chronos $
+# $Id: Util.pm 112 2006-01-09 16:52:08Z chronos $
 package BBCode::Util;
 use base qw(Exporter);
 use Carp qw(croak);
@@ -8,7 +8,7 @@ use URI ();
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our @EXPORT;
 our @EXPORT_OK;
 our %EXPORT_TAGS;
@@ -340,11 +340,18 @@ sub parseFontSize($) {
 	return undef;
 }
 
+# Official CSS 2.1 colors are passed through as-is
 my %cssColor = map { $_ => 1 } qw(
 	maroon red orange yellow olive
 	purple fuchsia white lime green
 	navy blue aqua teal
 	black silver gray
+);
+
+# Other named colors must map to an official named color or an #RRGGBB color
+my %extraColor = (
+	darkred		=> 'maroon',
+	darkblue	=> 'navy',
 );
 
 BEGIN { _export qw(parseColor parse) }
@@ -355,6 +362,7 @@ sub parseColor($) {
 	$_ = lc $_;
 
 	return $1 if /^(\w+)$/ and exists $cssColor{$1};
+	return $extraColor{$_} if exists $extraColor{$_};
 
 	if(s/^#//) {
 		s/^ ( [0-9a-f]{1,2} ) $/$1$1$1/x;

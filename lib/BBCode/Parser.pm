@@ -1,4 +1,4 @@
-# $Id: Parser.pm 91 2005-08-27 11:00:11Z chronos $
+# $Id: Parser.pm 112 2006-01-09 16:52:08Z chronos $
 package BBCode::Parser;
 use BBCode::Util qw(:parse :tag);
 use BBCode::TagSet;
@@ -8,7 +8,7 @@ use Carp qw(croak);
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 NAME
 
@@ -335,26 +335,26 @@ sub isPermitted($$):method {
 }
 
 sub _args(\$) {
-	my($ref,$ok,$arg,$k,$v,@args);
-	$ref = shift;
-	$ok = 0;
-	$arg = 0;
+	my $ref = shift;
+	my $ok = 0;
+	my $arg = 0;
+	my $k = undef;
+	my $v = '';
+	my @args;
 
 	while(length $$ref > 0) {
-		$v = '' if not defined $v;
-
 		if($$ref =~ s/^\\//) {
 			croak qq(Invalid BBCode: Backslash at end of text) unless $$ref =~ s/^(.)//s;
 			$v .= $1 unless $1 eq "\n";
 			next;
 		}
 
-		if($$ref =~ s/^\s*=\s*//) {
+		if(not defined $k and $$ref =~ s/^\s*=\s*//) {
 			if($arg) {
 				$k = uc $v;
 			} else {
 				$arg = 1;
-				$k = undef;
+				$k = '';
 			}
 			$v = '';
 			next;
@@ -447,13 +447,14 @@ sub _tokenize($$) {
 			next;
 		}
 
-		if($$ref =~ s/^ \[ ( \s* \w+ \s* ) ( [=,]? \s* ) //x) {
-			my $tag = uc($1);
+		if($$ref =~ s/^ \[ ( \s* \w+ \s* ) (?= \s | , | = | \] )//x) {
+			my $str = $1;
+			my $tag = uc($str);
 			$tag =~ s/\s+//g;
 			if(tagExists($tag)) {
 				push @tokens, [ $tag, _args($$ref) ];
 			} else {
-				push @tokens, [ 'TEXT', [ undef, "[$1$2" ] ];
+				push @tokens, [ 'TEXT', [ undef, "[$str" ] ];
 			}
 			next;
 		}

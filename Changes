@@ -4,10 +4,26 @@ A more detailed revision history is available via Subversion checkout.
 Browse <URL:svn://chronos-tachyon.net/projects/BBCode-Parser> for a complete
 history of the project.
 
-0.02
+0.21 [2006-01-09 09:47:13 -0600]
+* Added two new named colors: darkred and darkblue.
+* Fixed a glitch that depends on Perl's interaction between $1/$2 and subs.
+* Fixed a non-intuitive parser quirk that made e.g. links to CGI scripts
+  "break" (i.e. need quoting/backslashes when it wasn't strictly necessary).
+
+Thanks go to Alex Teslik <alex (AT) acatysmoof.com> for the bug report that
+led to this release.
+
+0.20 [2005-08-27 06:00:11 -0500]
+* Re-designed a lot of internals
+* Added $parser->clone() and BBCode::Parser->DEFAULT()
+* Added the beginnings of support for application-defined BBCode tags;
+  See tagUserDefined in BBCode::Util.
+  NOTE: The API for this feature will almost certainly change!
+
+0.02 - Never released (should have been forked from r85 on the SVN trunk)
 * Documentation fixes
 
 0.01 [2005-08-22 13:22:43 -0500]
 * Initial release
 
-$Id: Changes 91 2005-08-27 11:00:11Z chronos $
+$Id: Changes 112 2006-01-09 16:52:08Z chronos $

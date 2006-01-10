@@ -1,10 +1,10 @@
-# $Id: URL.pm 91 2005-08-27 11:00:11Z chronos $
+# $Id: URL.pm 112 2006-01-09 16:52:08Z chronos $
 package BBCode::Tag::URL;
 use base qw(BBCode::Tag);
 use BBCode::Util qw(:parse encodeHTML);
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.21';
 
 sub Class($):method {
 	return qw(LINK INLINE);
@@ -50,13 +50,19 @@ sub validateParam($$$):method {
 sub toHTML($):method {
 	my $this = shift;
 
-	my $ret = '<a href="'.encodeHTML($this->param('HREF')).'"';
-	$ret .= ' rel="nofollow"' if not $this->isFollowed;
-	$ret .= '>';
+	my $ret = '';
+	my $href = $this->param('HREF');
+	if(defined $href) {
+		$ret .= '<a href="'.encodeHTML($href).'"';
+		$ret .= ' rel="nofollow"' if not $this->isFollowed;
+		$ret .= '>';
+	}
 	foreach($this->body) {
 		$ret .= $_->toHTML;
 	}
-	$ret .= '</a>';
+	if(defined $href) {
+		$ret .= '</a>';
+	}
 
 	return $ret;
 }

@@ -1,4 +1,4 @@
-# $Id: Tag.pm 91 2005-08-27 11:00:11Z chronos $
+# $Id: Tag.pm 112 2006-01-09 16:52:08Z chronos $
 package BBCode::Tag;
 use BBCode::Util qw(:quote :tag);
 use BBCode::TagSet;
@@ -6,7 +6,7 @@ use Carp qw(croak);
 use HTML::Entities ();
 use strict;
 use warnings;
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 NAME
 
@@ -144,7 +144,7 @@ sub _create($$@):method {
 	while(@_) {
 		my($k,$v) = (undef,shift);
 		($k,$v) = @$v if ref $v and UNIVERSAL::isa($v,'ARRAY');
-		$k = $this->DefaultParam if not defined $k;
+		$k = $this->DefaultParam if not defined $k or $k eq '';
 		croak "No default parameter for [".$this->Tag."]" if not defined $k;
 		$this->param($k, $v);
 	}

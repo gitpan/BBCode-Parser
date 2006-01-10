@@ -1,4 +1,4 @@
-# $Id: UL.pm 91 2005-08-27 11:00:11Z chronos $
+# $Id: UL.pm 112 2006-01-09 16:52:08Z chronos $
 package BBCode::Tag::UL;
 use base qw(BBCode::Tag::LIST);
 use strict;

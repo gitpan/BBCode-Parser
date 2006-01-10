@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# $Id: 10-inline.t 91 2005-08-27 11:00:11Z chronos $
+# $Id: 10-inline.t 112 2006-01-09 16:52:08Z chronos $
 
-use Test::More tests => 55;
+use Test::More tests => 57;
 use strict;
 use warnings;
 use lib 't';
@@ -98,5 +98,9 @@ $p->set(follow_override => 1);
 
 bbtest	q([URL=http://slashdot.org/, FOLLOW=1]Linked[/URL] text),
 		q(<a href="http://slashdot.org/">Linked</a> text);
+
+bbtest	q([URL=http://www.example.org/?test=foo]Linked[/URL] text),
+		q([URL=http://www.example.org/?test\=foo]Linked[/URL] text),
+		q(<a href="http://www.example.org/?test=foo" rel="nofollow">Linked</a> text);
 
 # vim:set ft=perl:

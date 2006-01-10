@@ -25,9 +25,11 @@ sub bbtest($$;$) {
 	is($tree->toBBCode, $bbexpect, "$msg (BBCode)");
 
 	my $html = $tree->toHTML;
+	$html =~ s/&apos;/&#39;/g;
 	$html =~ s#^<div class="bbcode-body">\s*##;
 	$html =~ s#\s*</div>\s*$##;
 	$htmlexpect =~ s/^\s+|\s+$//g;
+	$htmlexpect =~ s/&apos;/&#39;/g;
 
 	is($html, $htmlexpect, "$msg (HTML)");
 }
