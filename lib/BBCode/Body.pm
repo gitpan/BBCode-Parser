@@ -1,4 +1,4 @@
-# $Id: Body.pm 112 2006-01-09 16:52:08Z chronos $
+# $Id: Body.pm 116 2006-01-10 16:41:53Z chronos $
 package BBCode::Body;
 use base qw(BBCode::Tag);
 use BBCode::Tag::Block;

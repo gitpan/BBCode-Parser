@@ -1,4 +1,4 @@
-# $Id: CODE.pm 112 2006-01-09 16:52:08Z chronos $
+# $Id: CODE.pm 116 2006-01-10 16:41:53Z chronos $
 package BBCode::Tag::CODE;
 use base qw(BBCode::Tag::Block);
 use BBCode::Util qw(encodeHTML);

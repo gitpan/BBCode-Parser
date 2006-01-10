@@ -1,4 +1,4 @@
-# $Id: HTML.pm 112 2006-01-09 16:52:08Z chronos $
+# $Id: HTML.pm 116 2006-01-10 16:41:53Z chronos $
 package BBCode::Tag::HTML;
 use base qw(BBCode::Tag);
 use strict;

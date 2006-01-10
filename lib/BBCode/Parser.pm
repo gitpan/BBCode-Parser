@@ -1,4 +1,4 @@
-# $Id: Parser.pm 112 2006-01-09 16:52:08Z chronos $
+# $Id: Parser.pm 116 2006-01-10 16:41:53Z chronos $
 package BBCode::Parser;
 use BBCode::Util qw(:parse :tag);
 use BBCode::TagSet;
@@ -8,7 +8,7 @@ use Carp qw(croak);
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 NAME
 

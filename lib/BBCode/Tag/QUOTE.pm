@@ -1,4 +1,4 @@
-# $Id: QUOTE.pm 112 2006-01-09 16:52:08Z chronos $
+# $Id: QUOTE.pm 116 2006-01-10 16:41:53Z chronos $
 package BBCode::Tag::QUOTE;
 use base qw(BBCode::Tag::Block);
 use BBCode::Util qw(:parse &encodeHTML);
