@@ -1,4 +1,4 @@
-# $Id: Tag.pm 116 2006-01-10 16:41:53Z chronos $
+# $Id: Tag.pm 109 2006-01-09 15:44:26Z chronos $
 package BBCode::Tag;
 use BBCode::Util qw(:quote :tag);
 use BBCode::TagSet;

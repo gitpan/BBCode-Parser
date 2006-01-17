@@ -1,4 +1,4 @@
-# $Id: Simple.pm 116 2006-01-10 16:41:53Z chronos $
+# $Id: Simple.pm 90 2005-08-27 10:58:31Z chronos $
 package BBCode::Tag::Simple;
 use BBCode::Util qw(encodeHTML);
 use strict;

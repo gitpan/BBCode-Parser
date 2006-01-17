@@ -1,16 +1,16 @@
-# $Id: LI.pm 116 2006-01-10 16:41:53Z chronos $
+# $Id: LI.pm 117 2006-01-17 14:36:56Z chronos $
 package BBCode::Tag::LI;
 use base qw(BBCode::Tag::Simple BBCode::Tag);
 use strict;
 use warnings;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 sub BodyPermitted($):method {
 	return 1;
 }
 
 sub BodyTags($):method {
-	# Really, should be :LIST :INLINE, but people do strange things...
+	# Despite previous reports to the contrary, :BLOCK is fine here
 	return qw(:LIST :BLOCK :INLINE);
 }
 

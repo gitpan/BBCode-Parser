@@ -1,4 +1,4 @@
-# $Id: Parser.pm 116 2006-01-10 16:41:53Z chronos $
+# $Id: Parser.pm 117 2006-01-17 14:36:56Z chronos $
 package BBCode::Parser;
 use BBCode::Util qw(:parse :tag);
 use BBCode::TagSet;
@@ -8,7 +8,7 @@ use Carp qw(croak);
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 NAME
 
@@ -504,6 +504,7 @@ sub _parse($$$) {
 TOKEN:while(@$ref) {
 		my $token = shift @$ref;
 
+		# TODO: Add option to make "Illegal close tag" non-fatal
 		if($token->[0] =~ s#^/##) {
 			my @old = @st;
 			while(@st) {
@@ -516,6 +517,7 @@ TOKEN:while(@$ref) {
 
 		my $tag = BBCode::Tag->new($this, @$token);
 
+		# TODO: This code is over-zealous about "correcting" things.
 		while(@st) {
 			eval {
 				_top(@st)->pushBody($tag);

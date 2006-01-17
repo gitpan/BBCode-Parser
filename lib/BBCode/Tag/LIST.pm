@@ -1,11 +1,11 @@
-# $Id: LIST.pm 116 2006-01-10 16:41:53Z chronos $
+# $Id: LIST.pm 117 2006-01-17 14:36:56Z chronos $
 package BBCode::Tag::LIST;
 use base qw(BBCode::Tag::Block);
 use BBCode::Util qw(:parse encodeHTML);
 use BBCode::Tag::TEXT ();
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.23';
 
 sub Class($):method {
 	return qw(LIST BLOCK);
@@ -51,29 +51,54 @@ sub validateParam($$$):method {
 	return $this->SUPER::validateParam($param,$val);
 }
 
+sub _text($$):method {
+	my $this = shift;
+	my $text = shift;
+	my $tag = BBCode::Tag->new($this->parser, 'TEXT', [ undef, $text ]);
+	return $tag;
+}
+
+sub _li($$):method {
+	my $this = shift;
+	my $text = shift;
+	my $tag = BBCode::Tag->new($this->parser, 'LI');
+	$tag->pushBody($this->_text($text));
+	return $tag;
+}
+
 sub pushBody($@):method {
 	my $this = shift;
-	my $i = 0;
-	while($i < @_) {
-		if(not defined $_[$i]) {
-			splice @_, $i, 1;
+	my @tags;
+
+	while(@_) {
+		my $tag = shift;
+
+		next if not defined $tag;
+
+		if(not ref $tag) {
+			unshift @_, $this->_text($tag);
 			next;
 		}
 
-		if(not ref $_[$i]) {
-			my $tag = BBCode::Tag->new('TEXT', $this->parser, [ undef, $_[$i] ] );
-			splice @_, $i, 1, $tag;
-			next;
+		if(UNIVERSAL::isa($tag,'BBCode::Tag::TEXT')) {
+			my $str = $tag->param(undef);
+			unless($str =~ /^\s*$/) {
+				push @tags, $this->_text("$1") if $str =~ s/^(\s+)//;
+				unshift @_, $this->_text("$1") if $str =~ s/(\s+)$//;
+				while($str =~ s/^(.*\S)(\s*\n\s*)//) {
+					my($item,$sep) = ($1,$2);
+					push @tags, $this->_li($item);
+					push @tags, $this->_text($sep);
+				}
+				push @tags, $this->_li($str);
+				next;
+			}
 		}
 
-		if(UNIVERSAL::isa($_[$i],'BBCode::Tag::TEXT')) {
-			die qq(Text not permitted inside [LIST] but outside [LI])
-				unless $_[$i]->param('STR') =~ /^\s*$/;
-		}
-
-		$i++;
+		push @tags, $tag;
 	}
-	return $this->SUPER::pushBody(@_);
+
+	return $this->SUPER::pushBody(@tags);
 }
 
 sub bodyHTML($):method {

@@ -4,6 +4,16 @@ A more detailed revision history is available via Subversion checkout.
 Browse <URL:svn://chronos-tachyon.net/projects/BBCode-Parser> for a complete
 history of the project.
 
+0.23 [2006-01-17 08:28:25 -0600]
+* Rewrote part of the [LIST] tag handling to support implicit list items.  It
+  guesstimates that each line of text is a new list item.  WARNING: Using tags
+  within an implicit list item (e.g. [URL] or [B]) will NOT work.
+* Despite previous reports to the contrary, research shows that HTML 4.01 has
+  absolutely no qualms about nesting block tags inside an <li>.  My bad.
+
+Further thanks to Alex Teslik for his real-world use of this module, which has
+helped shake out the entire 0.20 branch.
+
 0.22 [2006-01-10 10:28:46 -0600]
 * Added a tweak that allows nesting block tags within list items.  Technically
   not valid HTML, but users expect it.  At some point, I might replace <pre>
@@ -31,4 +41,4 @@ led to this release.
 0.01 [2005-08-22 13:22:43 -0500]
 * Initial release
 
-$Id: Changes 116 2006-01-10 16:41:53Z chronos $
+$Id: Changes 118 2006-01-17 14:37:23Z chronos $
