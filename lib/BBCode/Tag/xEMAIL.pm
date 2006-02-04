@@ -1,10 +1,10 @@
-# $Id: xEMAIL.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: xEMAIL.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::xEMAIL;
 use base qw(BBCode::Tag);
 use BBCode::Util qw(:parse :encode :text);
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.30';
 
 sub Tag($):method {
 	return 'EMAIL';
@@ -36,18 +36,6 @@ sub replace($):method {
 	} else {
 		return BBCode::Tag->new($this->parser, 'TEXT', [ undef, $text ]);
 	}
-}
-
-sub toBBCode($):method {
-	return shift->replace->toBBCode;
-}
-
-sub toHTML($):method {
-	return shift->replace->toHTML;
-}
-
-sub toLinkList($):method {
-	return shift->replace->toLinkList;
 }
 
 1;

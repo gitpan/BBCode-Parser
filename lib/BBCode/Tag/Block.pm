@@ -1,4 +1,4 @@
-# $Id: Block.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: Block.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::Block;
 use base qw(BBCode::Tag);
 use strict;
@@ -17,7 +17,8 @@ sub bodyHTML($):method {
 	local $_ = shift->SUPER::bodyHTML();
 	s#^\s* (?: <br/> \s* )*  ##x;
 	s# \s* (?: <br/> \s* )* $##x;
-	return $_;
+	return $_ unless wantarray;
+	return split /(?<=\n)/, $_;
 }
 
 1;

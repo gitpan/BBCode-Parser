@@ -1,4 +1,4 @@
-# $Id: Util.pm 109 2006-01-09 15:44:26Z chronos $
+# $Id: Util.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Util;
 use base qw(Exporter);
 use Carp qw(croak);
@@ -8,7 +8,7 @@ use URI ();
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.30';
 our @EXPORT;
 our @EXPORT_OK;
 our %EXPORT_TAGS;
@@ -183,22 +183,40 @@ sub parseBool($) {
 	return $_ ? 1 : 0;
 }
 
+BEGIN { _export qw(parseInt parse) }
+sub parseInt($) {
+	my $num = shift;
+	return undef if not defined $num;
+	$num =~ s/[\s,_]+//g;
+	$num =~ s/^\+//;
+	return 0	if $num =~ /^-?$/;
+	return 0+$1	if $num =~ /^ ( -? \d+ ) $/x;
+	return undef;
+}
+
 BEGIN { _export qw(parseNum parse) }
 sub parseNum($);
 sub parseNum($) {
-	local $_ = $_[0];
-	return undef if not defined $_;
-	s/^\s+|\s+$//g;
-	s/(?<=\d),(?=\d)//g;
-	s/(?<=\d)_+(?=\d)//g;
-	return 0 if /^ \. $/x;
-	return 0+$1 if /^ ( [+-]? \d+ ) \.? $/x;
-	return 0+$1 if /^ ( [+-]? \d* \. \d+ ) $/x;
-	if(/^ ( [+-]? [\d.]* ) e ( [+-]? [\d.]* ) $/xi) {
-		my($m,$e) = map parseNum($_), $1, $2;
-		return $m * (10 ** $e) if defined $m and defined $e;
+	my $num = shift;
+	return undef if not defined $num;
+	$num =~ s/[\s,_]+//g;
+	if($num =~ /^ (.*) e (.*) $/ix) {
+		my($m,$e) = ($1,$2);
+		$m = parseNum $m;
+		$e = parseNum $e;
+ 		return $m * (10 ** $e) if defined $m and defined $e;
+		return undef;
+ 	}
+	if($num =~ /^ ([^.]*) \. ([^.]*) $/x) {
+		my($i,$f) = ($1,$2);
+		$i = parseInt $i;
+		return undef unless defined $i;
+		return undef unless $f =~ /^(\d*)$/;
+		$num = "$i.$f";
+		$num =~ s/\.$//;
+		return 0+$num;
 	}
-	return 0;
+	return parseInt($num);
 }
 
 BEGIN { _export qw(parseEntity parse) }
@@ -271,70 +289,128 @@ sub parseListType($) {
 	return @ret;
 }
 
+# Conversion factors from CSS units to points
 my %conv = (
-	px	=> 0.75,
-
+	# Integer conversions within English units
 	pt	=> 1,
 	pc	=> 12,
 	in	=> 72,
 
+	# Floating-point conversions from Metric units
 	mm	=> 72/25.4,
 	cm	=> 72/2.54,
 
-	ex	=> 8,
-	em	=> 12,
+	# Somewhat approximate, but the CSS standard is actually rather
+	# picky about how many pixels a 'pixel' is at different resolutions,
+	# so this is actually relatively reliable.
+	px	=> 0.75,
 );
 
+# Emulation of <font size="num">...</font> from HTML 3.2
 # See <URL:http://www.w3.org/TR/CSS21/fonts.html#font-size-props>
 # Tweaked slightly to be more logical
 my @compat = qw(xx-small x-small small medium large x-large xx-large 300%);
 
 BEGIN { _export qw(parseFontSize parse) }
-sub parseFontSize($);
-sub parseFontSize($) {
-	local $_ = $_[0];
+sub parseFontSize($;$$$);
+sub parseFontSize($;$$$) {
+	local $_ = shift;
 	return undef unless defined $_;
+	my($base,$lo,$hi) = @_;
+	$base = 12 if not defined $base;
+	$lo = 8 if not defined $lo;
+	$hi = 72 if not defined $hi;
 	s/\s+/ /g;
 	s/^\s|\s$//g;
 
-	if(/^ (\d+ (?: \. \d+ )? ) \s? ([a-z]{2}) $/ix) {
-		my($n,$unit) = (0+$1,lc $2);
-		if(exists $conv{$unit}) {
-			my $n2 = $n / $conv{$unit};
-			if($n2 < 8) {
-				$n = POSIX::floor(0.5 + 8 * $conv{$unit});
-			} elsif($n2 > 72) {
-				$n = POSIX::floor(0.5 + 72 * $conv{$unit});
-			}
-			return "$n$unit";
-		}
-	}
-
+	# CSS 2.1 15.7 <absolute-size>
 	if(/^( (?:xx?-)? (?:large|small) | medium )$/ix) {
 		return lc $1;
 	}
 
+	# CSS 2.1 15.7 <relative-size>
+	# Note: Since [FONT] is nestable and not readily computable before HTML
+	#		rendering, this can allow a malicious user to escape the
+	#		admin-defined font size limits
 	if(/^ ( larger | smaller ) $/ix) {
 		return lc $1;
 	}
 
+	# CSS 2.1 4.3.2 <length>
+	if(/^ ( [\s\d._+-]+ ) ( [a-z]+ ) $/ix) {
+		my($n,$unit) = ($1,lc $2);
+		$n = parseNum $n;
+		if(defined $n and $n > 0) {
+			my $conv;
+			if(exists $conv{$unit}) {
+				$conv = $conv{$unit};
+			} elsif($unit =~ /^em$/i) {
+				$conv = $base;
+			} elsif($unit =~ /^ex$/i) {
+				$conv = $base * 0.5;
+			} else {
+				return undef;
+			}
+			my $n2 = $n * $conv;
+			if(defined $lo and $n2 < $lo) {
+				$n = $lo / $conv;
+			} elsif(defined $hi and $n2 > $hi) {
+				$n = $hi / $conv;
+			}
+			$n = sprintf "%.3f", $n;
+			$n =~ s/0+$//;
+			$n =~ s/\.$//;
+			return "$n$unit";
+		} else {
+			return undef;
+		}
+	}
+
+	# CSS 2.1 4.3.3 <percentage>
+	# Note: The same concerns apply as for <relative-size>
+	if(/^ ( [\s\d._+-]+ ) % $/x) {
+		my $n = parseNum $1;
+		if(defined $n and $n > 0) {
+			$n *= 0.01;
+			my $n2 = $n * $base;
+			if(defined $lo and $n2 < $lo) {
+				$n = $lo / $base;
+			} elsif(defined $hi and $n2 > $hi) {
+				$n = $hi / $base;
+			}
+			$n *= 100;
+			$n = sprintf "%.3f", $n;
+			$n =~ s/0+$//;
+			$n =~ s/\.$//;
+			return "$n%";
+		} else {
+			return undef;
+		}
+	}
+
+	# HTML 3.2 <font size="number">
+	# See <URL:http://www.w3.org/TR/REC-html32#font>
 	if(/^ (\d+) $/x) {
 		my $n = 0+$1;
 		if($n >= 0 and $n < @compat) {
 			return $compat[$n];
 		} else {
-			return parseFontSize("$n pt");
+			return parseFontSize("$n pt",$base,$lo,$hi);
 		}
 	}
 
+	# HTML 3.2 <font size="+number">
 	if(/^ \+ (\d+) $/x) {
-		# Roughly equivalent to CSS 2.1 "larger"
-		return parseFontSize sprintf "%d%%", 100 * (1.25 ** $1);
+		# "+1" is roughly equivalent to CSS 2.1 "larger"
+		my $n = sprintf "%f%%", 100 * (1.25 ** $1);
+		return parseFontSize($n,$base,$lo,$hi);
 	}
 
+	# HTML 3.2 <font size="-number">
 	if(/^ - (\d+) $/x) {
-		# Roughly equivalent to CSS 2.1 "smaller"
-		return parseFontSize sprintf "%d%%", 100 * (0.85 ** $1);
+		# "-1" is roughly equivalent to CSS 2.1 "smaller"
+		my $n = sprintf "%f%%", 100 * (0.85 ** $1);
+		return parseFontSize($n,$base,$lo,$hi);
 	}
 
 	return undef;
@@ -522,18 +598,41 @@ sub _url_parse($$) {
 	return undef if $url->as_string =~ /\bsanity\.check\.example\.com\b/i;
 	return undef if $url->can('userinfo') and defined $url->userinfo;
 	return undef if $url->can('host') and not defined $url->host;
-	if($url->can('to')) {
-		return undef if not defined $url->to;
-		return undef if not $url->to =~ /^ [\w.+-]+ \@ (?: \w[\w-]*(?<=\w) \. )* [a-z]{2,6} $/xi;
-		$url->query(undef);
+	if($url->scheme eq 'mailto') {
+		my %unsafe = $url->headers;
+		my %safe;
+		foreach my $key (keys %unsafe) {
+			if($key =~ /^(?:to|cc|bcc)$/i) {
+				my @to = split /,/, $unsafe{$key};
+				$key = lc $key;
+				foreach(@to) {
+					if(/^ ( [\w.+-]+ \@ (?: \w[\w-]*(?<=\w) \. )+ [a-z]{2,6} ) $/xi) {
+						if(exists $safe{$key}) {
+							$safe{$key} .= ",$1";
+						} else {
+							$safe{$key} = $1;
+						}
+					}
+				}
+				next;
+			}
+			if($key =~ /^subject$/i) {
+				if($unsafe{$key} =~ /^ ( [\x20-\x7E]+ ) $/x) {
+					$safe{subject} = $1;
+				}
+				next;
+			}
+		}
+		return undef unless exists $safe{to};
+		$url->headers(%safe);
 	}
 	return $url;
 }
 
 BEGIN { _export qw(parseURL parse) }
-my %schemes = map { $_ => 1 } qw(http https ftp data);
+my %schemes = map { $_ => 1 } qw(http https ftp mailto data);
 sub parseURL($) {
-	foreach('%', 'http://%') {
+	foreach('%', 'http://%', 'mailto:%') {
 		my $str = $_;
 		$str =~ s/%/$_[0]/g;
 		my $url = _url_parse($str, \%schemes);
@@ -543,14 +642,24 @@ sub parseURL($) {
 }
 
 BEGIN { _export qw(parseMailURL parse) }
+my %mail_schemes = (mailto => 1);
 sub parseMailURL($) {
 	foreach('%', 'mailto:%') {
 		my $str = $_;
 		$str =~ s/%/$_[0]/g;
-		my $url = _url_parse($str, { mailto => 1 });
+		my $url = _url_parse($str, \%mail_schemes);
 		return $url if defined $url;
 	}
 	return undef;
+}
+
+BEGIN { _export qw(multilineText text) }
+sub multilineText {
+	if(defined wantarray) {
+		my $str = join "", @_;
+		return $str unless wantarray;
+		return split /(?<=\n)/, $str;
+	}
 }
 
 BEGIN { _export qw(textURL text) }
@@ -595,6 +704,96 @@ sub textALT($) {
 	my $path = $url->path;
 	$path =~ s#^.*/##;
 	return "[$path]";
+}
+
+sub _b10_len($) {
+	my $n = shift;
+	if($n > 0) {
+		return 1+POSIX::floor(log($n)/log(10));
+	}
+	if($n < 0) {
+		return 2+POSIX::floor(log(-$n)/log(10));
+	}
+	return 1;
+}
+
+sub _max {
+	my $max;
+	while(@_) {
+		my $val = shift;
+		$max = $val if defined $val and (not defined $max or $val > $max);
+	}
+	return $max;
+}
+
+BEGIN { _export qw(createListSequence) }
+sub createListSequence($;$$) {
+	my($type,$start,$total) = @_;
+	my @list = parseListType($type);
+	$start = 1 unless defined $start;
+
+	if(@list and $list[0] eq 'ol') {
+		my $type = (@list > 1) ? $list[1] : 'decimal';
+
+		if(0) {
+			# Disabled until the generators can be split into separate packages
+			if($type =~ /^(upper|lower)-(alpha|latin|roman|greek)$/i) {
+				my $func = 'textOrder'.ucfirst(lc($2));
+				my $uc = $1 =~ /^upper$/i;
+				$func =~ s/Latin$/Alpha/;
+				{
+					no strict 'refs';
+					$func = \&{$func};
+				}
+				if($uc) {
+					return sub { $func->($start++).'.' };
+				} else {
+					return sub { lc $func->($start++).'.' };
+				}
+			}
+			if($type =~ /^(hiragana|katakana)(?:-(iroha))?$/i) {
+				my $func = 'textOrder'.ucfirst(lc($1)).(defined $2 ? uc($2) : '');
+				{
+					no strict 'refs';
+					$func = \&{$func};
+				}
+				return sub { $func->($start++).'.' };
+			}
+			if($type =~ /^cjk-ideographic$/i) {
+				return sub { textOrderCJK($start++).'.' };
+			}
+			if($type =~ /^hebrew$/i) {
+				return sub { textOrderHebrew($start++).'.' };
+			}
+			if($type =~ /^georgian$/i) {
+				return sub { textOrderGeorgian($start++).'.' };
+			}
+			if($type =~ /^armenian$/i) {
+				return sub { textOrderArmenian($start++).'.' };
+			}
+		}
+
+		if($type =~ /^decimal-leading-zero$/i) {
+			if(defined $total) {
+				my $end = $total + $start - 1;
+				my $len = _max 3, 1+_b10_len(abs $start), 1+_b10_len(abs $end);
+				my $fmt = sprintf '%% 0%dd.', $len;
+				return sub { sprintf($fmt,$start++) };
+			} else {
+				return sub { sprintf("% 03d.", $start++) };
+			}
+		}
+
+		if(defined $total) {
+			my $end = $total + $start - 1;
+			my $len = _max _b10_len $start, _b10_len $end;
+			my $fmt = sprintf '%%%dd.', $len;
+			return sub { sprintf($fmt,$start++) };
+		} else {
+			return sub { sprintf("%d.",$start++) };
+		}
+	}
+	return sub { '*' };
 }
 
 BEGIN {

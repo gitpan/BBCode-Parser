@@ -1,10 +1,10 @@
-# $Id: COLOR.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: COLOR.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::COLOR;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(:parse encodeHTML);
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.30';
 
 sub BodyPermitted($):method {
 	return 1;
@@ -35,20 +35,8 @@ sub validateParam($$$):method {
 sub replace($):method {
 	my $this = shift;
 	my $that = BBCode::Tag->new($this->parser, 'FONT', [ 'COLOR', $this->param('VAL') ]);
-	$that->pushBody($this->body);
+	@{$that->body} = @{$this->body};
 	return $that;
-}
-
-sub toBBCode($):method {
-	return shift->replace->toBBCode;
-}
-
-sub toHTML($):method {
-	return shift->replace->toHTML;
-}
-
-sub toLinkList($):method {
-	return shift->replace->toLinkList;
 }
 
 1;

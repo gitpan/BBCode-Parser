@@ -1,4 +1,4 @@
-# $Id: HR.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: HR.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::HR;
 use base qw(BBCode::Tag::Block);
 use strict;

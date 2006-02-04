@@ -1,9 +1,10 @@
-# $Id: S.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: S.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::S;
 use base qw(BBCode::Tag::Inline);
+use BBCode::Util qw(multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.30';
 
 sub BodyPermitted($):method {
 	return 1;
@@ -15,11 +16,13 @@ sub toHTML($):method {
 	my $css = $this->parser->css_direct_styles ? qq( style="text-decoration: line-through") : "";
 
 	my $ret = qq(<span class="${pfx}s"$css>);
-	foreach($this->body) {
-		$ret .= $_->toHTML;
-	}
+	$ret .= $this->bodyHTML;
 	$ret .= '</span>';
-	return $ret;
+	return multilineText $ret;
+}
+
+sub toText($):method {
+	return multilineText '~'.shift->bodyText().'~';
 }
 
 1;

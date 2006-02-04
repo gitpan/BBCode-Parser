@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: Build.PL 90 2005-08-27 10:58:31Z chronos $
+# $Id: Build.PL 158 2006-02-04 19:12:54Z chronos $
 
 use Module::Build;
 
@@ -9,11 +9,13 @@ my $build = Module::Build->new(
 	dist_author		=> 'Donald King <dlking@cpan.org>',
 	create_readme	=> 1,
 	create_makefile_pl => 'passthrough',
-#	requires		=> {
-#		'perl'			=> '5.6.1',
-#		'Some::Module'	=> '1.23',
-#		'Other::Module'	=> '>= 1.2, != 1.5, < 2.0',
-#	},
+	sign			=> 1,
+	requires		=> {
+		'perl'				=> '5.6.1',	# Possibly 5.8, need to test more
+		'Carp'				=> 0,
+		'HTML::Entities'	=> 0,
+		'URI'				=> 0,
+	},
 );
 
 $build->create_build_script;

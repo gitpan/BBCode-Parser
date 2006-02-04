@@ -1,17 +1,17 @@
-# $Id: QUOTE.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: QUOTE.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::QUOTE;
 use base qw(BBCode::Tag::Block);
-use BBCode::Util qw(:parse &encodeHTML);
+use BBCode::Util qw(:parse encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.30';
 
 sub BodyPermitted($):method {
 	return 1;
 }
 
 sub NamedParams($):method {
-	return qw(SRC FOLLOW CITE);
+	return qw(SRC CITE FOLLOW);
 }
 
 sub RequiredParams($):method {
@@ -54,18 +54,37 @@ sub toHTML($):method {
 	}
 	$who .= ':';
 
-	return
-		qq(<div class="${pfx}quote">\n).
-		qq(<div class="${pfx}quote-head">$who</div>\n).
-		qq(<blockquote class="${pfx}quote-body").(defined $cite ? ' cite="'.encodeHTML($cite).'"' : '').qq(>\n).
-		qq($body\n).
-		qq(</blockquote>\n).
+	return multilineText
+		qq(<div class="${pfx}quote">\n),
+		qq(<div class="${pfx}quote-head">$who</div>\n),
+		qq(<blockquote class="${pfx}quote-body"), (defined $cite ? ' cite="'.encodeHTML($cite).'"' : ''), qq(>\n),
+		qq($body\n),
+		qq(</blockquote>\n),
 		qq(</div>\n);
+}
+
+sub toText($):method {
+	my $this = shift;
+
+	my $who = $this->param('SRC');
+	my $cite = $this->param('CITE');
+	my $body = $this->bodyText;
+	$body =~ s/^/\t/m;
+	$body =~ s/^\t$//m;
+
+	my $ret = '';
+	$ret .= (defined $who ? "$who wrote" : 'Quote').":\n";
+	$ret .= "Source: <URL:$cite>\n" if defined $cite;
+	$ret .= $body;
+	$ret .= "\n";
+	return multilineText $ret;
 }
 
 sub toLinkList($;$):method {
 	my $this = shift;
-	my $ret = @_ ? shift : [];
+	my $ret = shift;
+	$ret = [] if not defined $ret;
+
 	my $src = $this->param('SRC');
 	my $cite = $this->param('CITE');
 	if(defined $cite) {

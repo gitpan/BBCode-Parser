@@ -4,6 +4,18 @@ A more detailed revision history is available via Subversion checkout.
 Browse <URL:svn://chronos-tachyon.net/projects/BBCode-Parser> for a complete
 history of the project.
 
+0.30 [2006-02-04 13:02:03 -0600]
+* Fixed a stupid bug: &entities; weren't treated as [ENT=entities]
+* Big improvements to the "bbtest" demo program.
+  Try "bbtest --help" for usage info.
+* Massive documentation updates
+* Finally added $tag->toText
+* Lots of scattered improvements (see logs -r124:155 for details)
+
+There is, however, one outstanding wart:
+* The current version of [IMG] always needs a closing [/IMG].
+  However, at this point I just want to get 0.30 out the door.
+
 0.23 [2006-01-17 08:28:25 -0600]
 * Rewrote part of the [LIST] tag handling to support implicit list items.  It
   guesstimates that each line of text is a new list item.  WARNING: Using tags
@@ -41,4 +53,4 @@ led to this release.
 0.01 [2005-08-22 13:22:43 -0500]
 * Initial release
 
-$Id: Changes 118 2006-01-17 14:37:23Z chronos $
+$Id: Changes 158 2006-02-04 19:12:54Z chronos $

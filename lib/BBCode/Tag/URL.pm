@@ -1,10 +1,10 @@
-# $Id: URL.pm 109 2006-01-09 15:44:26Z chronos $
+# $Id: URL.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::URL;
 use base qw(BBCode::Tag);
-use BBCode::Util qw(:parse encodeHTML);
+use BBCode::Util qw(:parse encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.21';
+our $VERSION = '0.30';
 
 sub Class($):method {
 	return qw(LINK INLINE);
@@ -19,7 +19,7 @@ sub BodyTags($):method {
 }
 
 sub NamedParams($):method {
-	return qw(HREF FOLLOW);
+	return qw(HREF FOLLOW TITLE);
 }
 
 sub RequiredParams($):method {
@@ -47,30 +47,68 @@ sub validateParam($$$):method {
 	return $this->SUPER::validateParam($param,$val);
 }
 
+sub replace($):method {
+	my $this = shift;
+	my $href = $this->param('HREF');
+	if(not defined $href) {
+		my $text = $this->bodyText;
+		my $url = parseURL $text;
+		if(not defined $url) {
+			return BBCode::Tag->new($this->parser, 'TEXT', [ undef, $text ]);
+		}
+		$this->param(HREF => $url);
+	}
+	return $this;
+}
+
 sub toHTML($):method {
 	my $this = shift;
 
 	my $ret = '';
 	my $href = $this->param('HREF');
 	if(defined $href) {
+		my $title = $this->param('TITLE');
 		$ret .= '<a href="'.encodeHTML($href).'"';
 		$ret .= ' rel="nofollow"' if not $this->isFollowed;
+		$ret .= ' title="'.encodeHTML($title).'"' if defined $title;
 		$ret .= '>';
 	}
-	foreach($this->body) {
-		$ret .= $_->toHTML;
-	}
+	$ret .= $this->bodyHTML;
 	if(defined $href) {
 		$ret .= '</a>';
 	}
 
-	return $ret;
+	return multilineText $ret;
+}
+
+sub toText($):method {
+	my $this = shift;
+
+	my $href = $this->param('HREF');
+	my $text = $this->bodyText;
+	my $ret;
+	if(defined $href) {
+		$ret = "_${text}_";
+		if($href =~ /^mailto:([\w.+-]+\@[\w.-]+)$/) {
+			$ret .= " <$1>";
+		} else {
+			$ret .= " <URL:$href>";
+		}
+	} else {
+		$ret = $text;
+	}
+	return multilineText $ret;
 }
 
 sub toLinkList($;$):method {
 	my $this = shift;
-	my $ret = @_ ? shift : [];
-	push @$ret, [ $this->isFollowed, $this->Tag, $this->param('HREF'), $this->bodyHTML ];
+	my $ret = shift;
+	$ret = [] if not defined $ret;
+
+	my $href = $this->param('HREF');
+	if(defined $href) {
+		push @$ret, [ $this->isFollowed, $this->Tag, $href, $this->bodyText ];
+	}
 	return $this->SUPER::toLinkList($ret);
 }
 

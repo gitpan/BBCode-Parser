@@ -1,4 +1,4 @@
-# $Id: Parser.pm 117 2006-01-17 14:36:56Z chronos $
+# $Id: Parser.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Parser;
 use BBCode::Util qw(:parse :tag);
 use BBCode::TagSet;
@@ -8,7 +8,11 @@ use Carp qw(croak);
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.30';
+
+BEGIN {
+	die "EBCDIC platforms not supported" unless ord "A" == 0x41;
+}
 
 =head1 NAME
 
@@ -25,31 +29,34 @@ C<BBCode::Parser> is a proper recursive parser for BBCode-formatted text.
 
 =head1 OVERVIEW
 
-A C<BBCode::Parser> object represents various settings that affect the parsing
+A C<BBCode::Parser> object stores various settings that affect the parsing
 process.  Simple settings are typically set when the parser is created using
-L</new>, but they can be queried using L</get> and altered using L</set>.
+L<new()|/"new">, but they can be queried using L<get()|/"get"> and altered
+using L<set()|/"set">.
 
-See L</SETTINGS> for more information.
+See L</"SETTINGS"> for more information.
 
 In addition to the simple settings, specific BBCode tags (or classes of tags)
-can be permitted or forbidden, using L</permit> and L</forbid>
-respectively.  By default, the only forbidden tag is C<[HTML]>, which is
-normally a security violation if permitted.
+can be permitted or forbidden, using L<permit()|/"permit"> and
+L<forbid()|/"forbid"> respectively.  By default, the only forbidden tag is
+C<[HTML]>, which is normally a security violation if permitted.
 
-See L</CLASSES> for a list of tag classes.
+See L</"CLASSES"> for a list of tag classes.
 
 Once the parser has been configured appropriately, parse trees can be created
-using the L</parse> method.  The parse tree will consist of objects derived
-from L<BBCode::Tag>; the root of the tree will be a L<BBCode::Body>.
+using the L<parse()|/"parse"> method.  The parse tree will consist of objects
+derived from L<BBCode::Tag|BBCode::Tag>; the root of the tree will be a
+L<BBCode::Body|BBCode::Body> object.
 
-Converting the parse tree to HTML is quite simple: call L<toHTML()|BBCode::Tag/toHTML>
+Converting the parse tree to HTML is quite simple: call L<toHTML()|BBCode::Tag/"toHTML">
 on the root of the tree.  Likewise, the parse tree can be converted back to
-BBCode by calling L<toBBCode()|BBCode::Tag/toBBCode>.  See L<BBCode::Tag/METHODS>
-to find out what other output methods are available.
+BBCode by calling L<toBBCode()|BBCode::Tag/"toBBCode">.  See
+L<"METHODS" in BBCode::Tag|BBCode::Tag/"METHODS"> to find out what other
+output methods are available.
 
 =head1 SETTINGS
 
-The following settings can be manipulated using L</get> and L</set>.
+The following settings can be manipulated using L<get()|/"get"> and L<set()|/"set">.
 
 =over
 
@@ -91,11 +98,15 @@ blog, the value might be TRUE for the blog owner but FALSE for visitors.
 
 For more information, see L<http://www.google.com/webmasters/bot.html#www>.
 
+If you turn this setting on, L<the follow_override setting|/"follow_override">
+behaves as if it were on as well.  That way, users can explicitly mark links
+with C<FOLLOW=0> if necessary.
+
 =item follow_override
 
 (Type: Boolean; Default: FALSE)
 
-This BBCode implementation allows a user to override L<the follow_links setting|/follow_links>
+This BBCode implementation allows a user to override L<the follow_links setting|/"follow_links">
 using a BBCode extension, C<FOLLOW=1>.  If this value is TRUE, the user can
 override C<follow_links>; otherwise, the user must abide by C<follow_links>.
 
@@ -113,7 +124,34 @@ bullets.
 
 =head1 CLASSES
 
-FIXME: Add documentation on tag classes.
+=over 4
+
+=item BLOCK
+
+Tags with the C<BLOCK> class are those that translate into block-level
+elements in HTML, e.g. C<[QUOTE]>, which becomes C<E<lt>blockquoteE<gt>>.
+They represent blocks of content that stand alone from other blocks, often
+with vertical padding to separate them visually.
+
+In general, C<BLOCK> tags are not allowed inside C<INLINE> tags.
+
+=item INLINE
+
+Tags with the C<INLINE> class are those that translate into inline elements
+in HTML, e.g. C<[URL]>, which becomes C<E<lt>aE<gt>>.  They represent content
+that's still part of the current flow of text, not the start of a new block.
+
+=item LINK
+
+Tags with the C<LINK> class are hyperlinks to external resources.  At the
+moment, the two tags with the C<LINK> class are C<[URL]> and C<[EMAIL]>.
+
+=item TEXT
+
+Tags with the C<TEXT> class are plain text.  At the moment, the three tags
+with the C<TEXT> class are C<[TEXT]>, C<[ENT]>, and C<[BR]>.
+
+=back
 
 =head1 METHODS
 
@@ -165,17 +203,63 @@ sub _canonize($) {
 
 =head2 DEFAULT
 
-	my $tree = DEFAULT->parse($code);
+	my $tree = BBCode::Parser->DEFAULT->parse($code);
 
 C<DEFAULT> returns the default parser.  If you change the default parser, all
-future parsers created with L</new> will incorporate your changes.  However,
-all existing parsers will be unaffected.
+future parsers created with L<new()|/"new"> will incorporate your changes.
+However, all existing parsers will be unaffected.
 
 =cut
 
 my $DEFAULT;
 INIT {
 	$DEFAULT = bless {};
+
+	$DEFAULT->{_tags} = {};
+	foreach(
+		# Pure text
+		'TEXT',
+		'ENT',
+		'BR',
+
+		# Links
+		'URL',
+		'EMAIL',
+		'IMG',
+
+		# Structural
+		'LIST',
+		'OL',
+		'UL',
+		'LI',
+		'QUOTE',
+		'CODE',
+
+		# Semantic
+		'ABBR',
+		'ACRONYM',
+		'HIDDEN',
+		'Q',
+
+		# Presentational
+		'HR',
+		'FONT',
+		'SIZE',
+		'COLOR',
+		'SUB',
+		'SUP',
+		'TT',
+		'B',
+		'I',
+		'S',
+		'U',
+
+		# Other
+		'HTML',
+	) {
+		$DEFAULT->addTag($_ => "BBCode::Tag::$_");
+	}
+
 	$DEFAULT->{_permit} = BBCode::TagSet->new;
 	$DEFAULT->{_forbid} = BBCode::TagSet->new;
 	foreach(@SETTINGS) {
@@ -200,7 +284,7 @@ C<clone> creates a new parser that copies the settings of an existing parser.
 After cloning, the two parsers are completely independent; changing settings
 in one does not affect the other.
 
-If any arguments are given, they are handed off to L<the set() method|/set>.
+If any arguments are given, they are handed off to L<the set() method|/"set">.
 
 =cut
 
@@ -208,6 +292,7 @@ sub clone($%):method {
 	my $this = shift;
 	$this = $this->DEFAULT if not ref $this;
 	my $that = bless {}, ref($this);
+	%{$that->{_tags}} = %{$this->{_tags}};
 	$that->{_permit} = $this->{_permit}->clone;
 	$that->{_forbid} = $this->{_forbid}->clone;
 	foreach(map { $_->[0] } @SETTINGS) {
@@ -222,7 +307,7 @@ sub clone($%):method {
 	my $parser = BBCode::Parser->new(%args);
 
 C<new> creates a new C<BBCode::Parser>.  Any arguments
-are handed off to L<the set() method|/set>.
+are handed off to L<the set() method|/"set">.
 
 =cut
 
@@ -238,7 +323,7 @@ sub new($%):method {
 		# [URL FOLLOW] forbidden
 	}
 
-C<get> fetches the current settings for the given parser.  See L</SETTINGS>
+C<get> fetches the current settings for the given parser.  See L</"SETTINGS">
 for a list of available settings.
 
 =cut
@@ -261,7 +346,7 @@ sub get($@):method {
 
 	$parser->set(follow_override => 1);
 
-C<set> alters the settings for the given parser. See L</SETTINGS> for a list
+C<set> alters the settings for the given parser. See L</"SETTINGS"> for a list
 of available settings.
 
 =cut
@@ -277,6 +362,27 @@ sub set($%):method {
 		$this->{$key} = $val;
 	}
 	return $this;
+}
+
+=head2 addTag
+
+TODO: Implement and document
+
+=cut
+
+sub addTag($$$):method {
+	my($this, $tag, $class) = @_;
+	return if $class eq "BBCode::Tag::$tag";
+	die qq(Not implemented);
+}
+
+sub removeTag($$):method {
+	die qq(Not implemented);
+}
+
+sub resolveTag($$):method {
+	my($this, $tag) = @_;
+	return tagLoadPackage($tag);
 }
 
 =head2 permit
@@ -407,13 +513,21 @@ sub _tokenize($$) {
 	my(@tokens);
 
 	while(length $$ref > 0) {
-		if($$ref =~ s/^ ([^\[<&]+) //x) {
+		if($$ref =~ s/^ ([^\[\]<&]+) //x) {
 			push @tokens, [ 'TEXT', [ undef, $1 ] ];
 			next;
 		}
 
 		if($$ref =~ s/^ \[ \s* \] //x) {
 			push @tokens, [ 'TEXT', [ undef, '[' ] ];
+			next;
+		}
+		if($$ref =~ s/^ \[ \[ //x) {
+			push @tokens, [ 'TEXT', [ undef, '[' ] ];
+			next;
+		}
+		if($$ref =~ s/^ \] \] //x) {
+			push @tokens, [ 'TEXT', [ undef, ']' ] ];
 			next;
 		}
 
@@ -430,12 +544,6 @@ sub _tokenize($$) {
 			next;
 		}
 
-		# Special case
-		if($$ref =~ s/^ \[ \s* ( URL | EMAIL | IMG ) \s* \] //xi) {
-			push @tokens, [ '_'.uc($1) ];
-			next;
-		}
-
 		if($$ref =~ s/^ \[ ( \s* \/? \s* \w+ \s* ) \] //x) {
 			my $tag = uc($1);
 			$tag =~ s/\s+//g;
@@ -444,6 +552,11 @@ sub _tokenize($$) {
 			} else {
 				push @tokens, [ 'TEXT', [ undef, "[$1]" ] ];
 			}
+			next;
+		}
+
+		if($$ref =~ s/^ \[ \s* \/ \s* \] //x) {
+			push @tokens, [ '/' ];
 			next;
 		}
 
@@ -476,7 +589,7 @@ sub _tokenize($$) {
 			next;
 		}
 
-		if($$ref =~ s/^ & ( \#? [w+-]+ ) ; //x) {
+		if($$ref =~ s/^ & ( \#? [\w+-]+ ) ; //x) {
 			if(defined parseEntity($1)) {
 				push @tokens, [ 'ENT', [ undef, $1 ] ];
 			} else {
@@ -508,7 +621,8 @@ TOKEN:while(@$ref) {
 		if($token->[0] =~ s#^/##) {
 			my @old = @st;
 			while(@st) {
-				if($token->[0] eq pop(@st)->Tag) {
+				my $top = pop(@st);
+				if($token->[0] eq $top->Tag or $token->[0] eq '') {
 					next TOKEN;
 				}
 			}
@@ -537,7 +651,7 @@ TOKEN:while(@$ref) {
 	my $tree = $parser->parse('[b]BBCode[/b] text.');
 
 C<parse> creates a parse tree for the given BBCode.  The result is a
-tree of L<BBCode::Tag> objects.  The most common use of the parse tree is
+tree of L<BBCode::Tag|BBCode::Tag> objects.  The most common use of the parse tree is
 to convert it to HTML using L<BBCode::Tag-E<gt>toHTML()|BBCode::Tag/"toHTML">:
 
 	my $html = $tree->toHTML;
@@ -545,8 +659,6 @@ to convert it to HTML using L<BBCode::Tag-E<gt>toHTML()|BBCode::Tag/"toHTML">:
 =cut
 
 sub parse($@):method {
-	croak qq(EBCDIC platforms not supported) unless "A" eq "\x41";
-
 	my $this = shift;
 	$this = $this->new() unless ref $this;
 
@@ -565,7 +677,7 @@ sub parse($@):method {
 
 =head1 SEE ALSO
 
-L<BBCode::Tag>
+L<BBCode::Tag|BBCode::Tag>
 
 L<svn://chronos-tachyon.net/projects/BBCode-Parser>
 

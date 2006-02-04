@@ -1,10 +1,10 @@
-# $Id: CODE.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: CODE.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::CODE;
 use base qw(BBCode::Tag::Block);
-use BBCode::Util qw(encodeHTML);
+use BBCode::Util qw(encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.30';
 
 sub BodyPermitted($):method {
 	return 1;
@@ -43,12 +43,12 @@ sub toHTML($):method {
 	my $body = $this->bodyHTML;
 	$body =~ s#<br/>$##mg;
 	$body =~ s#<br/>#\n#g;
-	return
-		qq(<div class="${pfx}code">\n).
-		qq(<div class="${pfx}code-head">).(defined $lang ? encodeHTML(ucfirst "$lang ") : "").qq(Code:</div>\n).
-		qq(<pre class="${pfx}code-body">\n).
-		qq($body\n).
-		qq(</pre>\n).
+	return multilineText
+		qq(<div class="${pfx}code">\n),
+		qq(<div class="${pfx}code-head">), (defined $lang ? encodeHTML(ucfirst "$lang ") : ""), qq(Code:</div>\n),
+		qq(<pre class="${pfx}code-body">\n),
+		qq($body\n),
+		qq(</pre>\n),
 		qq(</div>\n);
 }
 

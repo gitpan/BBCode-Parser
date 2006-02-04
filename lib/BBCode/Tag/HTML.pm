@@ -1,9 +1,10 @@
-# $Id: HTML.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: HTML.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::HTML;
 use base qw(BBCode::Tag);
+use BBCode::Util qw(multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.30';
 
 sub NamedParams($):method {
 	return qw(CODE);
@@ -15,12 +16,12 @@ sub DefaultParam($):method {
 
 sub toBBCode($):method {
 	my $this = shift;
-	return "[HTML]".$this->param('CODE')."[/HTML]";
+	return multilineText "[HTML]".$this->param('CODE')."[/HTML]";
 }
 
 sub toHTML($):method {
 	my $this = shift;
-	return $this->param('CODE');
+	return multilineText $this->param('CODE');
 }
 
 1;

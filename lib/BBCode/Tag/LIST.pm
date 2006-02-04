@@ -1,11 +1,11 @@
-# $Id: LIST.pm 117 2006-01-17 14:36:56Z chronos $
+# $Id: LIST.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::LIST;
 use base qw(BBCode::Tag::Block);
-use BBCode::Util qw(:parse encodeHTML);
+use BBCode::Util qw(:parse encodeHTML multilineText createListSequence);
 use BBCode::Tag::TEXT ();
 use strict;
 use warnings;
-our $VERSION = '0.23';
+our $VERSION = '0.30';
 
 sub Class($):method {
 	return qw(LIST BLOCK);
@@ -20,7 +20,7 @@ sub BodyTags($):method {
 }
 
 sub NamedParams($):method {
-	return qw(TYPE BULLET OUTSIDE);
+	return qw(TYPE START BULLET OUTSIDE);
 }
 
 sub RequiredParams($):method {
@@ -36,6 +36,9 @@ sub validateParam($$$):method {
 	if($param eq 'TYPE') {
 		return $val if parseListType($val) > 0;
 		return '*';
+	}
+	if($param eq 'START') {
+		return parseInt $val;
 	}
 	if($param eq 'BULLET') {
 		my $url = parseURL($val);
@@ -103,14 +106,13 @@ sub pushBody($@):method {
 
 sub bodyHTML($):method {
 	my $this = shift;
-	my @html;
+	my $html = '';
 	foreach($this->body) {
 		next unless UNIVERSAL::isa($_,'BBCode::Tag::LI');
-		push @html, $_->toHTML;
+		$html .= $_->toHTML;
 #		die qq(\n> $html[$#html]\nOMGWTFBBQ?) if $html[$#html] =~ m#<br\s*/>#i;
 	}
-	return @html if wantarray;
-	return join "", @html;
+	return multilineText $html;
 }
 
 sub ListDefault($):method {
@@ -125,6 +127,13 @@ sub toHTML($):method {
 	my @css;
 	if(@list > 1) {
 		push @css, qq(list-style-type: $list[1]);
+	}
+
+	my $start = $this->param('START');
+	if($list[0] eq 'ol' and defined $start) {
+		$start = qq( start="$start");
+	} else {
+		$start = '';
 	}
 
 	if($list[0] eq 'ul' and $this->parser->allow_image_bullets) {
@@ -144,7 +153,19 @@ sub toHTML($):method {
 	$body =~ s#(<li>)(<[uo]l>)#$1\n$2#g;
 	$body =~ s/^/\t/mg;
 	$body =~ s#^\t(?!</?li>)#\t\t#mg;
-	return "<$list[0]$css>\n$body</$list[0]>\n";
+	return multilineText "<$list[0]$start$css>\n$body</$list[0]>\n";
+}
+
+sub toText($):method {
+	my $this = shift;
+	my @body = grep { $_->isa('BBCode::Tag::LI') } $this->body;
+	my $seq = createListSequence($this->param('TYPE'), $this->param('START'), scalar(@body));
+
+	my $text = "";
+	foreach(@body) {
+		$text .= $seq->()." ".$_->toText."\n";
+	}
+	return multilineText $text;
 }
 
 1;

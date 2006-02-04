@@ -1,14 +1,11 @@
-# $Id: Body.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: Body.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Body;
 use base qw(BBCode::Tag);
 use BBCode::Tag::Block;
+use BBCode::Util qw(multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.20';
-
-sub new($@):method {
-	return shift->_create(@_);
-}
+our $VERSION = '0.30';
 
 sub Tag($):method {
 	return 'BODY';
@@ -32,14 +29,14 @@ sub toBBCode($):method {
 	foreach($this->body) {
 		$ret .= $_->toBBCode;
 	}
-	return $ret;
+	return multilineText $ret;
 }
 
 sub toHTML($):method {
 	my $this = shift;
 	my $pfx = $this->parser->css_prefix;
 	my $body = $this->bodyHTML;
-	return qq(<div class="${pfx}body">\n$body\n</div>\n);
+	return multilineText qq(<div class="${pfx}body">\n$body\n</div>\n);
 }
 
 1;

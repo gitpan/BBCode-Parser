@@ -1,10 +1,10 @@
-# $Id: ABBR.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: ABBR.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::ABBR;
 use base qw(BBCode::Tag::Inline);
-use BBCode::Util qw(encodeHTML);
+use BBCode::Util qw(encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.30';
 
 sub BodyPermitted($):method {
 	return 1;
@@ -30,7 +30,7 @@ sub toHTML($):method {
 		$ret .= ' title="'.encodeHTML($full).'"';
 	}
 	$ret .= '>'.$this->bodyHTML.'</'.lc($this->Tag).'>';
-	return $ret;
+	return multilineText $ret;
 }
 
 1;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# $Id: 10-inline.t 109 2006-01-09 15:44:26Z chronos $
+# $Id: 10-inline.t 158 2006-02-04 19:12:54Z chronos $
 
-use Test::More tests => 57;
+use Test::More tests => 61;
 use strict;
 use warnings;
 use lib 't';
@@ -85,11 +85,11 @@ bbtest	q([FONT=Verdana, SIZE=10pt, COLOR=blue]Multi-attribute FONT[/FONT]),
 bbtest	q([URL=http://slashdot.org/]Linked[/URL] text),
 		q(<a href="http://slashdot.org/" rel="nofollow">Linked</a> text);
 
-bbtest	q(More [EMAIL=chronos@chronos-tachyon.net]linked[/EMAIL] text),
-		q(More <a href="mailto:chronos@chronos-tachyon.net">linked</a> text);
+bbtest	q(More [EMAIL=mailto:chronos@chronos-tachyon.net]linked[/EMAIL] text),
+		q(More <a href="mailto:chronos@chronos-tachyon.net" rel="nofollow">linked</a> text);
 
-bbtest	q(Image: [IMG=http://chronos.dyndns.org/images/me/20040419-closeup.jpg, ALT="[My Face]", W=818, H=958]),
-		q(Image: <img src="http://chronos.dyndns.org/images/me/20040419-closeup.jpg" alt="[My Face]" width="818" height="958" />);
+bbtest	q(Image: [IMG=http://chronos-tachyon.net/images/me/20040419-closeup.jpg, ALT="[My Face]", W=818, H=958]A picture of Chronos Tachyon[/IMG]),
+		q(Image: <img src="http://chronos-tachyon.net/images/me/20040419-closeup.jpg" alt="[My Face]" width="818" height="958" title="A picture of Chronos Tachyon" />);
 
 bbtest	q([URL=http://slashdot.org/, FOLLOW=1]Linked[/URL] text),
 		q(<a href="http://slashdot.org/" rel="nofollow">Linked</a> text);
@@ -102,5 +102,15 @@ bbtest	q([URL=http://slashdot.org/, FOLLOW=1]Linked[/URL] text),
 bbtest	q([URL=http://www.example.org/?test=foo]Linked[/URL] text),
 		q([URL=http://www.example.org/?test\=foo]Linked[/URL] text),
 		q(<a href="http://www.example.org/?test=foo" rel="nofollow">Linked</a> text);
+
+$p->set(follow_links => 1);
+
+bbtest	q([URL=slashdot.org]Linked[/URL] text),
+		q([URL=http://slashdot.org/]Linked[/URL] text),
+		q(<a href="http://slashdot.org/">Linked</a> text);
+
+bbtest	q(More [EMAIL=chronos@chronos-tachyon.net]linked[/EMAIL] text),
+		q(More [EMAIL=mailto:chronos@chronos-tachyon.net]linked[/EMAIL] text),
+		q(More <a href="mailto:chronos@chronos-tachyon.net">linked</a> text);
 
 # vim:set ft=perl:

@@ -1,10 +1,10 @@
-# $Id: ENT.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: ENT.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::ENT;
 use base qw(BBCode::Tag);
-use BBCode::Util qw(:parse);
+use BBCode::Util qw(:parse decodeHTML);
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.30';
 
 sub Class($):method {
 	return qw(TEXT INLINE);
@@ -35,6 +35,13 @@ sub toHTML($):method {
 	my $this = shift;
 	my $ent = $this->param('VAL');
 	return "&$ent;" if defined $ent;
+	return "";
+}
+
+sub toText($):method {
+	my $this = shift;
+	my $ent = $this->param('VAL');
+	return decodeHTML("&$ent;") if defined $ent;
 	return "";
 }
 

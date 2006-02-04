@@ -39,7 +39,7 @@ is($result, <<'EOF',
 [1|IMG|http://d.com/|D.com]
 [0|URL|data:text/plain,Hello%20World|Inline]
 [0|QUOTE|http://e.com/|Gaius Julius Caesar]
-[0|URL|http://f.com/|f.com]
+[0|URL|http://f.com/|F.com]
 EOF
 "toLinkList test");
 

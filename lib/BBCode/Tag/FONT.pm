@@ -1,10 +1,10 @@
-# $Id: FONT.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: FONT.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::FONT;
 use base qw(BBCode::Tag::Inline);
-use BBCode::Util qw(:parse encodeHTML);
+use BBCode::Util qw(:parse encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.30';
 
 sub BodyPermitted($):method {
 	return 1;
@@ -45,11 +45,8 @@ sub validateParam($$$):method {
 }
 
 sub toHTML($):method {
-	my $this = shift;
-	my $ret = '';
-	foreach($this->body) {
-		$ret .= $_->toHTML;
-	}
+	my $this = shift->replace;
+	my $ret = $this->bodyHTML;
 	my $face = $this->param('FACE');
 	my $size = $this->param('SIZE');
 	my $color = $this->param('COLOR');
@@ -58,7 +55,7 @@ sub toHTML($):method {
 	push @css, sprintf "font-size: %s", encodeHTML($size)		if defined $size;
 	push @css, sprintf "color: %s", encodeHTML($color)			if defined $color;
 	return $ret unless @css;
-	return '<span style="'.join('; ',@css).'">'.$ret.'</span>';
+	return multilineText '<span style="'.join('; ',@css).'">'.$ret.'</span>';
 }
 
 1;

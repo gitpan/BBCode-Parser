@@ -11,23 +11,24 @@ DESCRIPTION
     "BBCode::Parser" is a proper recursive parser for BBCode-formatted text.
 
 OVERVIEW
-    A "BBCode::Parser" object represents various settings that affect the
+    A "BBCode::Parser" object stores various settings that affect the
     parsing process. Simple settings are typically set when the parser is
-    created using "new", but they can be queried using "get" and altered
-    using "set".
+    created using new(), but they can be queried using get() and altered
+    using set().
 
     See "SETTINGS" for more information.
 
     In addition to the simple settings, specific BBCode tags (or classes of
-    tags) can be permitted or forbidden, using "permit" and "forbid"
+    tags) can be permitted or forbidden, using permit() and forbid()
     respectively. By default, the only forbidden tag is "[HTML]", which is
     normally a security violation if permitted.
 
     See "CLASSES" for a list of tag classes.
 
     Once the parser has been configured appropriately, parse trees can be
-    created using the "parse" method. The parse tree will consist of objects
-    derived from BBCode::Tag; the root of the tree will be a BBCode::Body.
+    created using the parse() method. The parse tree will consist of objects
+    derived from BBCode::Tag; the root of the tree will be a BBCode::Body
+    object.
 
     Converting the parse tree to HTML is quite simple: call toHTML() on the
     root of the tree. Likewise, the parse tree can be converted back to
@@ -35,7 +36,7 @@ OVERVIEW
     what other output methods are available.
 
 SETTINGS
-    The following settings can be manipulated using "get" and "set".
+    The following settings can be manipulated using get() and set().
 
     css_prefix
         (Type: String; Default: "bbcode-")
@@ -76,6 +77,10 @@ SETTINGS
         For more information, see
         <http://www.google.com/webmasters/bot.html#www>.
 
+        If you turn this setting on, the follow_override setting behaves as
+        if it were on as well. That way, users can explicitly mark links
+        with "FOLLOW=0" if necessary.
+
     follow_override
         (Type: Boolean; Default: FALSE)
 
@@ -94,14 +99,36 @@ SETTINGS
         custom bullets.
 
 CLASSES
-    FIXME: Add documentation on tag classes.
+    BLOCK
+        Tags with the "BLOCK" class are those that translate into
+        block-level elements in HTML, e.g. "[QUOTE]", which becomes
+        "<blockquote>". They represent blocks of content that stand alone
+        from other blocks, often with vertical padding to separate them
+        visually.
+
+        In general, "BLOCK" tags are not allowed inside "INLINE" tags.
+
+    INLINE
+        Tags with the "INLINE" class are those that translate into inline
+        elements in HTML, e.g. "[URL]", which becomes "<a>". They represent
+        content that's still part of the current flow of text, not the start
+        of a new block.
+
+    LINK
+        Tags with the "LINK" class are hyperlinks to external resources. At
+        the moment, the two tags with the "LINK" class are "[URL]" and
+        "[EMAIL]".
+
+    TEXT
+        Tags with the "TEXT" class are plain text. At the moment, the three
+        tags with the "TEXT" class are "[TEXT]", "[ENT]", and "[BR]".
 
 METHODS
   DEFAULT
-            my $tree = DEFAULT->parse($code);
+            my $tree = BBCode::Parser->DEFAULT->parse($code);
 
     "DEFAULT" returns the default parser. If you change the default parser,
-    all future parsers created with "new" will incorporate your changes.
+    all future parsers created with new() will incorporate your changes.
     However, all existing parsers will be unaffected.
 
   clone
@@ -138,6 +165,9 @@ METHODS
 
     "set" alters the settings for the given parser. See "SETTINGS" for a
     list of available settings.
+
+  addTag
+    TODO: Implement and document
 
   permit
             $parser->permit(qw(:INLINE !:LINK));

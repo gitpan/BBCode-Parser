@@ -1,4 +1,4 @@
-# $Id: SUP.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: SUP.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::SUP;
 use base qw(BBCode::Tag::Simple BBCode::Tag::Inline);
 use strict;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# $Id: 40-stress.t 107 2006-01-09 15:22:37Z chronos $
+# $Id: 40-stress.t 158 2006-02-04 19:12:54Z chronos $
 
-use Test::More tests => 25;
+use Test::More tests => 27;
 use strict;
 use warnings;
 use lib 't';
@@ -13,8 +13,12 @@ BEGIN { use_ok 'BBCode::Parser'; }
 our $p = BBCode::Parser->new;
 
 bbtest	q([TEXT="[FOO]"]),
-		q([]FOO]),
+		q([[FOO]]),
 		q([FOO]);
+
+bbtest	q([TEXT="[Foo, Bar"]),
+		q([[Foo, Bar),
+		q([Foo, Bar);
 
 bbtest	q([TEXT="&foo"]),
 		q([ENT=amp]foo),

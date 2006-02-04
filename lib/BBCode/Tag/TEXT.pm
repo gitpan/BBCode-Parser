@@ -1,10 +1,10 @@
-# $Id: TEXT.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: TEXT.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::TEXT;
 use base qw(BBCode::Tag);
-use BBCode::Util qw(encodeHTML);
+use BBCode::Util qw(encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.20';
+our $VERSION = '0.30';
 
 sub Class($):method {
 	return qw(TEXT INLINE);
@@ -21,10 +21,11 @@ sub DefaultParam($):method {
 sub toBBCode($):method {
 	my $this = shift;
 	local $_ = $this->param('STR');
-	s/\[/[]/g;
+	s/\[/[[/g;
+	s/\]/]]/g;
 	s/&/[ENT=amp]/g;
-	s/<(?=URL:)/[ENT=lt]/gi;
-	return $_;
+	s/<(?=UR[IL]:)/[ENT=lt]/gi;
+	return multilineText $_;
 }
 
 sub toHTML($):method {
@@ -32,7 +33,11 @@ sub toHTML($):method {
 	my $html = encodeHTML($this->param('STR'));
 	$html =~ s/&#xA;/\n/g;
 	$html =~ s#(?=\n)#<br/>#g;
-	return $html;
+	return multilineText $html;
+}
+
+sub toText($):method {
+	return multilineText shift->param('STR');
 }
 
 1;

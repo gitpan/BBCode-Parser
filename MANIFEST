@@ -46,10 +46,14 @@ lib/BBCode/Tag/xEMAIL.pm
 lib/BBCode/Tag/xIMG.pm
 lib/BBCode/Tag/xURL.pm
 t/common.ph
-t/00-basic.t
+t/00-util.t
+t/05-basic.t
 t/10-inline.t
 t/20-block.t
 t/30-raw.t
 t/35-link.t
 t/40-stress.t
+extra/find-project-files.pl
+extra/future-css3.diff
+extra/greek-list.bbc
 SIGNATURE    Added here by Module::Build

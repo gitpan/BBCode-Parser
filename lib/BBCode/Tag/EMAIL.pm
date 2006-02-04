@@ -1,30 +1,10 @@
-# $Id: EMAIL.pm 90 2005-08-27 10:58:31Z chronos $
+# $Id: EMAIL.pm 158 2006-02-04 19:12:54Z chronos $
 package BBCode::Tag::EMAIL;
-use base qw(BBCode::Tag);
+use base qw(BBCode::Tag::URL);
 use BBCode::Util qw(:parse encodeHTML);
 use strict;
 use warnings;
-our $VERSION = '0.01';
-
-sub Class($):method {
-	return qw(LINK INLINE);
-}
-
-sub BodyPermitted($):method {
-	return 1;
-}
-
-sub BodyTags($):method {
-	return qw(:INLINE !:LINK);
-}
-
-sub NamedParams($):method {
-	return qw(HREF);
-}
-
-sub DefaultParam($):method {
-	return 'HREF';
-}
+our $VERSION = '0.30';
 
 sub validateParam($$$):method {
 	my($this,$param,$val) = @_;
@@ -32,7 +12,7 @@ sub validateParam($$$):method {
 	if($param eq 'HREF') {
 		my $url = parseMailURL($val);
 		if(defined $url) {
-			return $url->to;
+			return $url->as_string;
 		} else {
 			die qq(Invalid value "$val" for [EMAIL]);
 		}
@@ -40,22 +20,18 @@ sub validateParam($$$):method {
 	return $this->SUPER::validateParam($param,$val);
 }
 
-sub toHTML($):method {
+sub replace($):method {
 	my $this = shift;
-	my $ret = '<a href="mailto:'.encodeHTML($this->param('HREF')).'">';
-	foreach($this->body) {
-		$ret .= $_->toHTML;
+	my $href = $this->param('HREF');
+	if(not defined $href) {
+		my $text = $this->bodyText;
+		my $url = parseMailURL $text;
+		if(not defined $url) {
+			return BBCode::Tag->new($this->parser, 'TEXT', [ undef, $text ]);
+		}
+		$this->param(HREF => $url);
 	}
-	$ret .= '</a>';
-
-	return $ret;
-}
-
-sub toLinkList($;$):method {
-	my $this = shift;
-	my $ret = @_ ? shift : [];
-	push @$ret, [ $this->isFollowed, $this->Tag, $this->param('HREF'), $this->bodyHTML ];
-	return $this->SUPER::toLinkList($ret);
+	return $this;
 }
 
 1;
