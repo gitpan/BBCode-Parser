@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 10-inline.t 158 2006-02-04 19:12:54Z chronos $
+# $Id: 10-inline.t 161 2006-02-05 17:31:00Z chronos $
 
 use Test::More tests => 61;
 use strict;
@@ -88,7 +88,7 @@ bbtest	q([URL=http://slashdot.org/]Linked[/URL] text),
 bbtest	q(More [EMAIL=mailto:chronos@chronos-tachyon.net]linked[/EMAIL] text),
 		q(More <a href="mailto:chronos@chronos-tachyon.net" rel="nofollow">linked</a> text);
 
-bbtest	q(Image: [IMG=http://chronos-tachyon.net/images/me/20040419-closeup.jpg, ALT="[My Face]", W=818, H=958]A picture of Chronos Tachyon[/IMG]),
+bbtest	q(Image: [IMG=http://chronos-tachyon.net/images/me/20040419-closeup.jpg, ALT="[My Face]", W=818, H=958, TITLE="A picture of Chronos Tachyon"]),
 		q(Image: <img src="http://chronos-tachyon.net/images/me/20040419-closeup.jpg" alt="[My Face]" width="818" height="958" title="A picture of Chronos Tachyon" />);
 
 bbtest	q([URL=http://slashdot.org/, FOLLOW=1]Linked[/URL] text),

@@ -1,6 +1,6 @@
 ---
 name: BBCode-Parser
-version: 0.30
+version: 0.31
 author:
   - 'Donald King <dlking@cpan.org>'
 abstract: Parses BBCode tags
@@ -16,10 +16,10 @@ provides:
     version: 0.30
   BBCode::Parser:
     file: lib/BBCode/Parser.pm
-    version: 0.30
+    version: 0.31
   BBCode::Tag:
     file: lib/BBCode/Tag.pm
-    version: 0.30
+    version: 0.31
   BBCode::Tag::ABBR:
     file: lib/BBCode/Tag/ABBR.pm
     version: 0.30
@@ -64,7 +64,7 @@ provides:
     version: 0.30
   BBCode::Tag::IMG:
     file: lib/BBCode/Tag/IMG.pm
-    version: 0.30
+    version: 0.31
   BBCode::Tag::Inline:
     file: lib/BBCode/Tag/Inline.pm
     version: 0.01

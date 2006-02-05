@@ -1,4 +1,4 @@
-# $Id: Tag.pm 158 2006-02-04 19:12:54Z chronos $
+# $Id: Tag.pm 161 2006-02-05 17:31:00Z chronos $
 package BBCode::Tag;
 use BBCode::Util qw(:quote :tag multilineText);
 use BBCode::TagSet;
@@ -6,7 +6,7 @@ use Carp qw(croak);
 use HTML::Entities ();
 use strict;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 # Note: Due to the huge differences between using BBCode::Tag and
 #       subclassing BBCode::Tag, the POD is no longer interleaved
@@ -101,6 +101,11 @@ sub new:method {
 sub init($):method {
 	my $this = shift;
 
+	$this->{params} = {};
+	foreach($this->NamedParams) {
+		$this->{params}->{$_} = undef;
+	}
+
 	if($this->BodyPermitted) {
 		$this->{body} = [];
 		$this->{permit} = BBCode::TagSet->new;
@@ -110,11 +115,6 @@ sub init($):method {
 		} else {
 			$this->{permit}->add(':ALL');
 		}
-	}
-
-	$this->{params} = {};
-	foreach($this->NamedParams) {
-		$this->{params}->{$_} = undef;
 	}
 
 	return $this;

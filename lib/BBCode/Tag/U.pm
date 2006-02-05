@@ -1,4 +1,4 @@
-# $Id: U.pm 158 2006-02-04 19:12:54Z chronos $
+# $Id: U.pm 161 2006-02-05 17:31:00Z chronos $
 package BBCode::Tag::U;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(multilineText);

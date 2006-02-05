@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: Build.PL 158 2006-02-04 19:12:54Z chronos $
+# $Id: Build.PL 161 2006-02-05 17:31:00Z chronos $
 
 use Module::Build;
 

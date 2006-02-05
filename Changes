@@ -4,6 +4,9 @@ A more detailed revision history is available via Subversion checkout.
 Browse <URL:svn://chronos-tachyon.net/projects/BBCode-Parser> for a complete
 history of the project.
 
+0.31 [2006-02-05 11:29:19 -0600]
+* Fixed the [IMG SRC][/IMG] wart from 0.30
+
 0.30 [2006-02-04 13:02:03 -0600]
 * Fixed a stupid bug: &entities; weren't treated as [ENT=entities]
 * Big improvements to the "bbtest" demo program.
@@ -53,4 +56,4 @@ led to this release.
 0.01 [2005-08-22 13:22:43 -0500]
 * Initial release
 
-$Id: Changes 158 2006-02-04 19:12:54Z chronos $
+$Id: Changes 161 2006-02-05 17:31:00Z chronos $

@@ -1,12 +1,16 @@
-# $Id: IMG.pm 158 2006-02-04 19:12:54Z chronos $
+# $Id: IMG.pm 161 2006-02-05 17:31:00Z chronos $
 package BBCode::Tag::IMG;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(:parse :text encodeHTML);
 use strict;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 sub BodyPermitted($):method {
+	my $this_or_class = shift;
+	if(ref $this_or_class and defined $this_or_class->param('SRC')) {
+		return 0;
+	}
 	return 1;
 }
 
@@ -49,16 +53,21 @@ sub validateParam($$$):method {
 sub replace($):method {
 	my $this = shift;
 	my($src,$alt) = map { $this->param($_) } qw(SRC ALT);
+	if(defined $src) {
+		# [IMG SRC] has no body...
+		delete $this->{body};
+		delete $this->{permit};
+		delete $this->{forbid};
+	}
 	return $this if defined $src and defined $alt;
 
-	my $text = $this->bodyText;
-	my $url;
-
+	my($text,$url);
 	if(defined $src) {
 		$url = parseURL $src;
 		die "BUG: Cannot re-parse URL <$src>" unless defined $url;
-		$text = textALT $url if $text =~ /^\s*$/;
+		$text = textALT $url;
 	} else {
+		$text = $this->bodyText;
 		$url = parseURL $text;
 		goto boom unless defined $url;
 		$text = textALT $url;

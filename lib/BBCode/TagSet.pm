@@ -1,4 +1,4 @@
-# $Id: TagSet.pm 158 2006-02-04 19:12:54Z chronos $
+# $Id: TagSet.pm 161 2006-02-05 17:31:00Z chronos $
 package BBCode::TagSet;
 use BBCode::Util qw(:tag);
 use Carp qw(croak);

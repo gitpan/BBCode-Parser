@@ -1,4 +1,4 @@
-# $Id: Parser.pm 158 2006-02-04 19:12:54Z chronos $
+# $Id: Parser.pm 161 2006-02-05 17:31:00Z chronos $
 package BBCode::Parser;
 use BBCode::Util qw(:parse :tag);
 use BBCode::TagSet;
@@ -8,7 +8,7 @@ use Carp qw(croak);
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 BEGIN {
 	die "EBCDIC platforms not supported" unless ord "A" == 0x41;

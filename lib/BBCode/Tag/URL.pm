@@ -1,4 +1,4 @@
-# $Id: URL.pm 158 2006-02-04 19:12:54Z chronos $
+# $Id: URL.pm 161 2006-02-05 17:31:00Z chronos $
 package BBCode::Tag::URL;
 use base qw(BBCode::Tag);
 use BBCode::Util qw(:parse encodeHTML multilineText);

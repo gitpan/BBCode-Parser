@@ -1,4 +1,4 @@
-# $Id: EMAIL.pm 158 2006-02-04 19:12:54Z chronos $
+# $Id: EMAIL.pm 161 2006-02-05 17:31:00Z chronos $
 package BBCode::Tag::EMAIL;
 use base qw(BBCode::Tag::URL);
 use BBCode::Util qw(:parse encodeHTML);

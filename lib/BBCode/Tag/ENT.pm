@@ -1,4 +1,4 @@
-# $Id: ENT.pm 158 2006-02-04 19:12:54Z chronos $
+# $Id: ENT.pm 161 2006-02-05 17:31:00Z chronos $
 package BBCode::Tag::ENT;
 use base qw(BBCode::Tag);
 use BBCode::Util qw(:parse decodeHTML);
