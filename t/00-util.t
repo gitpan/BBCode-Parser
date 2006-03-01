@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 00-util.t 161 2006-02-05 17:31:00Z chronos $
+# $Id: 00-util.t 186 2006-03-01 18:01:08Z chronos $
 
 use Test::More tests => 101;
 use strict;

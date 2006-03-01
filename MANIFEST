@@ -56,4 +56,8 @@ t/40-stress.t
 extra/find-project-files.pl
 extra/future-css3.diff
 extra/greek-list.bbc
+extra/basic-style.css
+extra/show-pod-cover.pl
+t/xx-pod-coverage.t
+t/xx-pod.t
 SIGNATURE    Added here by Module::Build

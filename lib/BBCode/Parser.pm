@@ -1,4 +1,4 @@
-# $Id: Parser.pm 161 2006-02-05 17:31:00Z chronos $
+# $Id: Parser.pm 186 2006-03-01 18:01:08Z chronos $
 package BBCode::Parser;
 use BBCode::Util qw(:parse :tag);
 use BBCode::TagSet;
@@ -8,7 +8,7 @@ use Carp qw(croak);
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 BEGIN {
 	die "EBCDIC platforms not supported" unless ord "A" == 0x41;
@@ -212,8 +212,14 @@ However, all existing parsers will be unaffected.
 =cut
 
 my $DEFAULT;
-INIT {
+sub DEFAULT() {
+	return $DEFAULT if defined $DEFAULT;
+
 	$DEFAULT = bless {};
+
+	foreach(@SETTINGS) {
+		$DEFAULT->{$_->[0]} = $_->[2];
+	}
 
 	$DEFAULT->{_tags} = {};
 	foreach(
@@ -262,13 +268,8 @@ INIT {
 
 	$DEFAULT->{_permit} = BBCode::TagSet->new;
 	$DEFAULT->{_forbid} = BBCode::TagSet->new;
-	foreach(@SETTINGS) {
-		$DEFAULT->{$_->[0]} = $_->[2];
-	}
 	$DEFAULT->permit(':ALL');
 	$DEFAULT->forbid('HTML');
-}
-sub DEFAULT() {
 	return $DEFAULT;
 }
 

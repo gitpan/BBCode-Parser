@@ -1,10 +1,10 @@
-# $Id: QUOTE.pm 161 2006-02-05 17:31:00Z chronos $
+# $Id: QUOTE.pm 186 2006-03-01 18:01:08Z chronos $
 package BBCode::Tag::QUOTE;
 use base qw(BBCode::Tag::Block);
 use BBCode::Util qw(:parse encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 sub BodyPermitted($):method {
 	return 1;
@@ -58,7 +58,7 @@ sub toHTML($):method {
 		qq(<div class="${pfx}quote">\n),
 		qq(<div class="${pfx}quote-head">$who</div>\n),
 		qq(<blockquote class="${pfx}quote-body"), (defined $cite ? ' cite="'.encodeHTML($cite).'"' : ''), qq(>\n),
-		qq($body\n),
+		qq(<div>\n$body\n</div>\n),
 		qq(</blockquote>\n),
 		qq(</div>\n);
 }

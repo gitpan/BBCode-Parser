@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 20-block.t 161 2006-02-05 17:31:00Z chronos $
+# $Id: 20-block.t 186 2006-03-01 18:01:08Z chronos $
 
 use Test::More tests => 19;
 use strict;
@@ -27,8 +27,10 @@ END_A
 <div class="bbcode-quote">
 <div class="bbcode-quote-head">Quote:</div>
 <blockquote class="bbcode-quote-body">
+<div>
 Foo<br/>
 Bar
+</div>
 </blockquote>
 </div>
 END_C
@@ -149,7 +151,9 @@ END_B
 <div class="bbcode-quote">
 <div class="bbcode-quote-head"><a href="http://www.chronos-tachyon.net/">Chronos wrote</a>:</div>
 <blockquote class="bbcode-quote-body" cite="http://www.chronos-tachyon.net/">
+<div>
 Foo!
+</div>
 </blockquote>
 </div>
 END_C
