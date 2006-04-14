@@ -1,4 +1,4 @@
-# $Id: LIST.pm 186 2006-03-01 18:01:08Z chronos $
+# $Id: LIST.pm 200 2006-04-14 12:26:48Z chronos $
 package BBCode::Tag::LIST;
 use base qw(BBCode::Tag::Block);
 use BBCode::Util qw(:parse encodeHTML multilineText createListSequence);

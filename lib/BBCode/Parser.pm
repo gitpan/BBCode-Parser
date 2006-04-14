@@ -1,4 +1,4 @@
-# $Id: Parser.pm 186 2006-03-01 18:01:08Z chronos $
+# $Id: Parser.pm 200 2006-04-14 12:26:48Z chronos $
 package BBCode::Parser;
 use BBCode::Util qw(:parse :tag);
 use BBCode::TagSet;
@@ -8,7 +8,7 @@ use Carp qw(croak);
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 BEGIN {
 	die "EBCDIC platforms not supported" unless ord "A" == 0x41;
@@ -98,20 +98,54 @@ blog, the value might be TRUE for the blog owner but FALSE for visitors.
 
 For more information, see L<http://www.google.com/webmasters/bot.html#www>.
 
-If you turn this setting on, L<the follow_override setting|/"follow_override">
-behaves as if it were on as well.  That way, users can explicitly mark links
-with C<FOLLOW=0> if necessary.
+(If you turn this setting on, C<follow_override> behaves as if it were on as
+well.  That way, users can explicitly mark links with C<FOLLOW=0> if
+necessary.)
 
 =item follow_override
 
 (Type: Boolean; Default: FALSE)
 
-This BBCode implementation allows a user to override L<the follow_links setting|/"follow_links">
-using a BBCode extension, C<FOLLOW=1>.  If this value is TRUE, the user can
-override C<follow_links>; otherwise, the user must abide by C<follow_links>.
+This BBCode implementation allows a user to override C<follow_links> using a
+BBCode extension, the C<FOLLOW> parameter.  If this value is TRUE, the user
+can override C<follow_links> with C<FOLLOW=1>; otherwise, the user must abide
+by C<follow_links>.
+
+(However, a user can always specify C<FOLLOW=0> regardless of this setting.
+If the user posting the link doesn't think the link is trustworthy, it's
+obviously not trustworthy.)
 
 The same considerations that apply to C<follow_links> also apply to this
 setting.
+
+=item newwindow_links
+
+(Type: Boolean; Default: FALSE)
+
+For reasons largely having to do with site aesthetics, some site owners prefer
+for external links to each open in a new window using C<E<lt>a target="_blank"E<gt>>.
+For reasons largely having to do with browsing experience, some users prefer
+to summarily execute the aforementioned site owners in the most painful manner
+available.  If you turn this option on, you will anger and frustrate people
+who suddenly find that their back buttons and/or tabs don't work right when
+they visit your site.  Please take due consideration of that before setting
+this option to a TRUE value and taking choices away from the people reading
+your website.
+
+=item newwindow_override
+
+(Type: Boolean; Default: FALSE)
+
+This BBCode implementation allows a user to override C<newwindow_links> using
+a BBCode extension, the C<NEWWINDOW> parameter.  If this value is TRUE, the
+user can force the link to open in the same window with C<NEWWINDOW=0>, or
+force the link to open in a new window with C<NEWWINDOW=1>.  If this value is
+FALSE, the user has no say whatsoever.
+
+The same considerations that apply to C<newwindow_links> also apply to this
+setting, but in drastically reduced form.  If you feel the need to open links
+in new windows, please do it by turning this setting on and leaving
+C<newwindow_links> off.
 
 =item allow_image_bullets
 
@@ -176,6 +210,8 @@ BEGIN {
 		[ 'css_direct_styles',		\&parseBool,		0			],
 		[ 'follow_links',			\&parseBool,		0			],
 		[ 'follow_override',		\&parseBool,		0			],
+		[ 'newwindow_links',		\&parseBool,		0			],
+		[ 'newwindow_override',		\&parseBool,		0			],
 		[ 'allow_image_bullets',	\&parseBool,		1			],
 	);
 	%SETTINGS = map { $_->[0] => $_ } @SETTINGS;

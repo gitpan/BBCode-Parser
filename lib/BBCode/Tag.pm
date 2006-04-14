@@ -1,4 +1,4 @@
-# $Id: Tag.pm 186 2006-03-01 18:01:08Z chronos $
+# $Id: Tag.pm 200 2006-04-14 12:26:48Z chronos $
 package BBCode::Tag;
 use BBCode::Util qw(:quote :tag multilineText);
 use BBCode::TagSet;
@@ -6,7 +6,7 @@ use Carp qw(croak);
 use HTML::Entities ();
 use strict;
 use warnings;
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 
 # Note: Due to the huge differences between using BBCode::Tag and
 #       subclassing BBCode::Tag, the POD is no longer interleaved
@@ -238,6 +238,18 @@ sub isFollowed($):method {
 		};
 	}
 	return $follow;
+}
+
+sub openInNewWindow($):method {
+	my $this = shift;
+	my($nw,$nwo) = $this->parser->get(qw(newwindow_links newwindow_override));
+	if($nwo) {
+		eval {
+			my $user = $this->param('NEWWINDOW');
+			$nw = $user if defined $user;
+		};
+	}
+	return $nw;
 }
 
 sub toBBCode($):method {

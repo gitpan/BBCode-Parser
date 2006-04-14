@@ -1,4 +1,4 @@
-# $Id: TT.pm 186 2006-03-01 18:01:08Z chronos $
+# $Id: TT.pm 200 2006-04-14 12:26:48Z chronos $
 package BBCode::Tag::TT;
 use base qw(BBCode::Tag::Simple BBCode::Tag::Inline);
 use strict;

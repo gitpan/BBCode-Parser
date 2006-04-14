@@ -4,6 +4,11 @@ A more detailed revision history is available via Subversion checkout.
 Browse <URL:svn://chronos-tachyon.net/projects/BBCode-Parser> for a complete
 history of the project.
 
+0.33 [2006-04-14 07:21:10 -0500]
+* Added some new options for <a target="_blank">
+
+Thanks go to Kevin Smith <ksmith (AT) ecymtech.com> for suggesting it.
+
 0.32 [2006-03-01 11:42:40 -0600]
 * Backported a fix to BBCode::Parser->DEFAULT from the development trunk
 
@@ -63,4 +68,4 @@ led to this release.
 0.01 [2005-08-22 13:22:43 -0500]
 * Initial release
 
-$Id: Changes 186 2006-03-01 18:01:08Z chronos $
+$Id: Changes 200 2006-04-14 12:26:48Z chronos $

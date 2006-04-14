@@ -1,4 +1,4 @@
-# $Id: Util.pm 186 2006-03-01 18:01:08Z chronos $
+# $Id: Util.pm 200 2006-04-14 12:26:48Z chronos $
 package BBCode::Util;
 use base qw(Exporter);
 use Carp qw(croak);

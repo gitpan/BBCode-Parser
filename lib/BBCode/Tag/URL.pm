@@ -1,10 +1,10 @@
-# $Id: URL.pm 186 2006-03-01 18:01:08Z chronos $
+# $Id: URL.pm 200 2006-04-14 12:26:48Z chronos $
 package BBCode::Tag::URL;
 use base qw(BBCode::Tag);
 use BBCode::Util qw(:parse encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 sub Class($):method {
 	return qw(LINK INLINE);
@@ -19,7 +19,7 @@ sub BodyTags($):method {
 }
 
 sub NamedParams($):method {
-	return qw(HREF FOLLOW TITLE);
+	return qw(HREF FOLLOW NEWWINDOW TITLE);
 }
 
 sub RequiredParams($):method {
@@ -42,6 +42,9 @@ sub validateParam($$$):method {
 		}
 	}
 	if($param eq 'FOLLOW') {
+		return parseBool $val;
+	}
+	if($param eq 'NEWWINDOW') {
 		return parseBool $val;
 	}
 	return $this->SUPER::validateParam($param,$val);
@@ -70,6 +73,7 @@ sub toHTML($):method {
 		my $title = $this->param('TITLE');
 		$ret .= '<a href="'.encodeHTML($href).'"';
 		$ret .= ' rel="nofollow"' if not $this->isFollowed;
+		$ret .= ' target="_blank"' if $this->openInNewWindow;
 		$ret .= ' title="'.encodeHTML($title).'"' if defined $title;
 		$ret .= '>';
 	}

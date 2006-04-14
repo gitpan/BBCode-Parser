@@ -1,4 +1,4 @@
-# $Id: HIDDEN.pm 186 2006-03-01 18:01:08Z chronos $
+# $Id: HIDDEN.pm 200 2006-04-14 12:26:48Z chronos $
 package BBCode::Tag::HIDDEN;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(multilineText);
