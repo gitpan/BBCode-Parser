@@ -1,10 +1,10 @@
-# $Id: URL.pm 200 2006-04-14 12:26:48Z chronos $
+# $Id: URL.pm 284 2006-12-01 07:51:49Z chronos $
 package BBCode::Tag::URL;
 use base qw(BBCode::Tag);
 use BBCode::Util qw(:parse encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 sub Class($):method {
 	return qw(LINK INLINE);

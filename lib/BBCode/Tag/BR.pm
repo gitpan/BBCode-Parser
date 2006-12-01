@@ -1,9 +1,9 @@
-# $Id: BR.pm 200 2006-04-14 12:26:48Z chronos $
+# $Id: BR.pm 284 2006-12-01 07:51:49Z chronos $
 package BBCode::Tag::BR;
 use base qw(BBCode::Tag);
 use strict;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.34';
 
 sub Class($):method {
 	return qw(TEXT INLINE);

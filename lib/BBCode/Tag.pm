@@ -1,4 +1,4 @@
-# $Id: Tag.pm 200 2006-04-14 12:26:48Z chronos $
+# $Id: Tag.pm 284 2006-12-01 07:51:49Z chronos $
 package BBCode::Tag;
 use BBCode::Util qw(:quote :tag multilineText);
 use BBCode::TagSet;
@@ -6,7 +6,7 @@ use Carp qw(croak);
 use HTML::Entities ();
 use strict;
 use warnings;
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 # Note: Due to the huge differences between using BBCode::Tag and
 #       subclassing BBCode::Tag, the POD is no longer interleaved

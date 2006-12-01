@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: xx-pod-coverage.t 200 2006-04-14 12:26:48Z chronos $
+# $Id: xx-pod-coverage.t 284 2006-12-01 07:51:49Z chronos $
 
 use warnings;
 use strict;

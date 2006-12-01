@@ -1,9 +1,9 @@
-# $Id: Simple.pm 200 2006-04-14 12:26:48Z chronos $
+# $Id: Simple.pm 284 2006-12-01 07:51:49Z chronos $
 package BBCode::Tag::Simple;
 use BBCode::Util qw(encodeHTML multilineText);
 use strict;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.34';
 
 sub toHTML($):method {
 	my $this = shift;

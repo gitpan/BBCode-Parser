@@ -1,4 +1,4 @@
-# $Id: Util.pm 200 2006-04-14 12:26:48Z chronos $
+# $Id: Util.pm 284 2006-12-01 07:51:49Z chronos $
 package BBCode::Util;
 use base qw(Exporter);
 use Carp qw(croak);
@@ -8,7 +8,7 @@ use URI ();
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.34';
 our @EXPORT;
 our @EXPORT_OK;
 our %EXPORT_TAGS;
@@ -151,9 +151,13 @@ BEGIN { _export qw(encodeHTML encode); }
 sub encodeHTML($) {
 	local $_ = $_[0];
 	if(defined $_) {
-		$_ = HTML::Entities::encode($_);
-		s/'/&apos;/g;
-		s/([^\x20-\x7E])/sprintf "&#x%X;", ord($1)/eg;
+		# Basic HTML/XML escapes
+		s/&/&amp;/g;
+		s/</&lt;/g;
+		s/>/&gt;/g;
+		s/"/&quot;/g;
+		# &apos; is XML-only
+		s/'/&#39;/g;
 	}
 	return $_;
 }

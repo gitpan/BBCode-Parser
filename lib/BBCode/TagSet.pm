@@ -1,10 +1,10 @@
-# $Id: TagSet.pm 200 2006-04-14 12:26:48Z chronos $
+# $Id: TagSet.pm 284 2006-12-01 07:51:49Z chronos $
 package BBCode::TagSet;
 use BBCode::Util qw(:tag);
 use Carp qw(croak);
 use strict;
 use warnings;
-our $VERSION = '0.20';
+our $VERSION = '0.34';
 
 sub new($@):method {
 	my $class = shift;

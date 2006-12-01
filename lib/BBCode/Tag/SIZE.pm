@@ -1,10 +1,10 @@
-# $Id: SIZE.pm 200 2006-04-14 12:26:48Z chronos $
+# $Id: SIZE.pm 284 2006-12-01 07:51:49Z chronos $
 package BBCode::Tag::SIZE;
 use base qw(BBCode::Tag::Inline);
 use BBCode::Util qw(:parse);
 use strict;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.34';
 
 sub BodyPermitted($):method {
 	return 1;
